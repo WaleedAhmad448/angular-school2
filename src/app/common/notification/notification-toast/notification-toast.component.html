@@ -1,0 +1,22 @@
+<div class=" overlay bg-white ">
+  <div class=" p-3 w-100 my-2" *ngIf="notification">
+
+
+
+  <div class="d-flex flex-column ">
+      <div class="d-flex w-100  gap-4 align-items-center">
+          <span class="d-flex align-items-center justify-content-center bg-primary  text-white rounded-circle" style="width:30;height:30px">
+              <i [class]="'pi '+[notification.category.icon || '']+ 'text-xs'"></i>
+          </span>
+          <span class="w-60 font-weight-bold fs-3">{{notification && notification.title ? notification.title : ""}}</span>
+      </div>
+      <p class="my-2 p-0 fs-6">{{notification && notification.details ? notification.details : ""}}</p>
+  </div>
+  <div class="d-flex  gap-4 align-items-center ">
+      <button class="btn btn-primary" (click)="navagiate( notification.actions?.[0]?.path || '')">{{notification.actions?.[0]?.customFields?.['Title'] ?? ''}}</button>
+      <button class="btn  bg-off-white
+      "(click)="navagiate(notification.actions?.[1]?.path ?? ' ')">{{notification.actions?.[1]?.customFields?.['Title'] ?? ''}}</button>
+
+
+  </div>
+</div>

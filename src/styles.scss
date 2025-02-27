@@ -1,0 +1,219 @@
+/* You can add global styles to this file, and also import other style files */
+$gutter: 1rem; //for primeflex grid system
+
+@import "./assets/scss/style";
+/* Layout */
+@import "assets/layout/styles/layout/layout.scss";
+/* PrimeNG */
+@import "primeng/resources/primeng.min.css";
+@import "assets/scss/prime-theme.css";
+@import "primeflex/primeflex.scss";
+@import "primeicons/primeicons.css";
+
+/* Quill Text Editor for p-editor */
+@import "quill/dist/quill.core.css";
+@import "quill/dist/quill.snow.css";
+
+.page-wrapper{
+    min-height: calc(100vh - 13rem);
+}
+
+.min-width-300{
+    min-width: 300px;
+}
+
+.full-screen{
+    z-index: 9999999;
+    right: 0;
+    min-height: 100vh ;
+    min-width: 100vw ;
+    position:fixed ;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .p-breadcrumb-list{
+    gap: 0.5rem !important;
+  }
+
+  .custom-overlaypanel .p-overlaypanel-content {
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    max-height: calc(100vh - 35rem);
+  }
+  .p-overlaypanel-content::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+  }
+
+  .p-accordion.custom-accordion {
+    .p-accordion-header{
+        .p-accordion-header-link{
+            border: 0 !important;
+        }
+    }
+    .p-toggleable-content{
+        .p-accordion-content{
+            padding-top: 0.25rem !important;
+            padding-bottom: 0.25rem !important;
+            border: 0 !important;
+            .p-accordion-action.active{
+                background-color: var(--bluegray-100) !important;
+            }
+        }
+    }
+    .p-accordion-header:not(.p-disabled) .p-accordion-header-link:focus {
+        outline: 0 none;
+        outline-offset: 0;
+        box-shadow: unset !important;
+    }
+}
+
+.group-by-item.active{
+    background-color: var(--bluegray-100) !important;
+}
+
+.no-padding.p-overlaypanel .p-overlaypanel-content {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+
+.shadow-sm {
+    box-shadow: 0 0.125rem 0.25rem rgba(var(--bs-body-color-rgb), 0.075) !important;
+}
+.header{
+    .layout-topbar-button {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        // color: var(--text-color-secondary);
+        border-radius: 50%;
+        width: 2.25rem;
+        height: 2.25rem;
+        cursor: pointer;
+        background: #F1F4F6;
+        transition: background-color .2s;
+        &.user{
+          width: unset !important;
+          padding-left: 1rem;
+          padding-right: 1rem;
+        }
+        &:hover {
+            color: var(--text-color);
+            background-color: var(--surface-hover);
+        }
+
+        &:focus {
+            outline: 0 none;
+            outline-offset: 0;
+            transition: box-shadow .2s;
+            box-shadow: var(--focus-ring);
+        }
+
+        i {
+            font-size: 1.25rem;
+        }
+
+        span {
+            font-size: 1rem;
+            // display: none;
+        }
+    }
+}
+
+
+.w-unset{
+    width: unset !important;
+  }
+
+  .bg-glass{
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+.p-datatable .p-datatable-thead > tr > th:first-child, .p-datatable .p-datatable-tbody > tr > td:first-child {
+    text-align: left;
+}
+
+.grid-gutter-1 > .col,
+.grid-gutter-1 > [class*="col-"] {
+  padding: 0.25rem;
+}
+
+.grid-gutter-2 > .col,
+.grid-gutter-2 > [class*="col-"] {
+  padding: 0.5rem;
+}
+
+.grid-gutter-3 > .col,
+.grid-gutter-3 > [class*="col-"] {
+  padding: .75rem;
+}
+
+.grid-gutter-4 > .col,
+.grid-gutter-4 > [class*="col-"] {
+  padding: 1rem;
+}
+
+.grid-gutter-5 > .col,
+.grid-gutter-5 > [class*="col-"] {
+  padding: 1.5rem;
+}
+
+p-inputnumber.p-element.p-inputwrapper{
+    width: 100%;
+}
+
+.editable-event-form .event-form-control{
+    position: relative;
+  }
+  .editable-event-form .event-form-control:before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      // height: 4rem;
+      z-index: 9;
+      cursor: move;
+      display: block;
+  }
+  .editable-event-form .event-form-control:hover {
+    background: #fff;
+    border-style: dashed;
+    border-color: var(--blue-400);
+  }
+
+
+  .menu-separator{
+    border-top: 1px solid #e2e8f0;
+    margin: 2px 0;
+}
+.print-only{
+    display: none !important;
+}
+@media print{
+    .print-only{
+        display: block !important;
+    }
+    .p-breadcrumb,
+    .p-button,
+    .p-paginator,
+    .no-print{
+      display: none !important;
+    }
+}
+
+div.p-fileupload {
+    .p-message-wrapper{
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+}

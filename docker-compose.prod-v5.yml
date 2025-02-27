@@ -1,0 +1,11 @@
+version: '3.4'
+services:
+  fileware-web-app:
+    image: ${REGISTRY:-demo-saned}/fileware-web-app:${PLATFORM:-linux}-prod
+    build:
+      context: .
+      dockerfile: Dockerfile.prod-v5
+      args:
+        - BRANCH_NG_ENV=prod
+    volumes:
+      - /.yarn-cache:/.yarn-cache

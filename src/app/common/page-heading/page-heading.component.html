@@ -1,0 +1,57 @@
+
+<div class="mb-1 {{pageHeaderOptions.containerClass}}">
+    <p-breadcrumb styleClass="pt-0 px-1 bg-transparent" [model]="pageHeaderOptions.breadcrumbs" [home]="home"></p-breadcrumb>
+    <div class="flex align-items-start flex-column lg:justify-content-between lg:flex-row">
+        <div>
+            <div class="text-900 text-3xl font-medium mb-1 flex align-items-center" *ngIf="pageHeaderOptions.title || pageHeaderOptions.titleTemplate">
+                {{pageHeaderOptions.title | titlecase}}
+                <ng-container *ngIf="pageHeaderOptions.titleTemplate">
+                    <ng-container *ngTemplateOutlet="pageHeaderOptions.titleTemplate"></ng-container>
+                </ng-container>
+            </div>
+            <p class="mt-0 ml-1 mb-1 text-700" *ngIf="pageHeaderOptions.description">
+                {{pageHeaderOptions.description}}
+            </p>
+            <div class="flex align-items-center text-700 flex-wrap {{pageHeaderOptions.statusClass}}" *ngIf="(pageHeaderOptions.status?.length ?? -1) > 0 || pageHeaderOptions.statusTemplate">
+                <ng-container *ngIf="pageHeaderOptions.statusTemplate; else defaultTemplate">
+                    <ng-container *ngTemplateOutlet="pageHeaderOptions.statusTemplate"></ng-container>
+                </ng-container>
+                <ng-template #defaultTemplate>
+                    <ng-container *ngFor="let item of pageHeaderOptions.status; let last= last">
+                        <div class="{{last? '' :'mr-5'}} flex align-items-center mt-3">
+                            <i class="{{item.icon}} mr-2" *ngIf="item.icon"></i>
+                            <span>{{item.label}}</span>
+                        </div>
+                    </ng-container>
+                </ng-template>
+            </div>
+        </div>
+        <div class="mt-3 lg:mt-0">
+            <div class="flex align-items-center gap-2 {{pageHeaderOptions.actionsClass}}" *ngIf="(pageHeaderOptions.actions?.length ?? -1) > 0 || pageHeaderOptions.actionsTemplate">
+                <ng-container *ngIf="pageHeaderOptions.actionsTemplate; else defaultTemplate">
+                    <ng-container *ngTemplateOutlet="pageHeaderOptions.actionsTemplate"></ng-container>
+                </ng-container>
+                <ng-template #defaultTemplate>
+                    <ng-container *ngFor="let item of pageHeaderOptions.actions">
+                        <div class="mx-1">
+                            <button pButton pRipple class="{{item.class}}"
+                            label="{{ item.label }}"
+                            icon="{{ item.icon }}"
+                            [iconPos]="item.iconPos ?? 'left'"
+                            (click)="item.onClick? item.onClick($event): false"></button>
+                        </div>
+                    </ng-container>
+                </ng-template>
+                <ng-content select="[actions]"></ng-content>
+            </div>
+        </div>
+    </div>
+    <div class="flex align-items-center justify-content-between {{pageHeaderOptions.filterClass}}" *ngIf="pageHeaderOptions.filtersTemplate">
+        <div class="flex flex-column gap-2 lg:flex-row lg:align-items-center">
+            <ng-container *ngIf="pageHeaderOptions.filtersTemplate">
+                <ng-container *ngTemplateOutlet="pageHeaderOptions.filtersTemplate"></ng-container>
+            </ng-container>
+        </div>
+    </div>
+    <ng-content></ng-content>
+</div>

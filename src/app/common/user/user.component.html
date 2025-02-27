@@ -1,0 +1,19 @@
+<ng-container *ngIf="withMenu;else withoutMenue">
+    <a href="javascript:;" (click)="menu.toggle($event)" class="">
+        <p-chip [label]="user?.name??'Kitsys developer'" styleClass="cursor-pointer shadow-sm bg-light text-primary"
+        [style]="{'height': '2.25rem'}"
+        [image]="user?.imageUrl" *ngIf="user?.imageUrl"></p-chip>
+        <p-chip [label]="user?.name??'Kitsys developer'" styleClass="cursor-pointer shadow-sm bg-light text-primary"
+        [style]="{'height': '2.25rem'}"
+        icon="pi pi-user" *ngIf="!user?.imageUrl"></p-chip>
+    </a>
+  </ng-container>
+  <ng-template #withoutMenue>
+    <p-avatar size="large" shape="circle" [pTooltip]="user?.name??''" [image]="user?.imageUrl" *ngIf="user?.imageUrl"></p-avatar>
+    <p-avatar size="large" shape="circle" [pTooltip]="user?.name??''" [label]="initials(user?.name)" icon="pi pi-user" *ngIf="!user?.imageUrl"></p-avatar>
+  </ng-template>
+  <p-menu #menu [model]="items"
+  [appendTo]="'body'"
+  [styleClass]="'bg-glass'" [popup]="true"></p-menu>
+  
+  

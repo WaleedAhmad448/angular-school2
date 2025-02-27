@@ -1,0 +1,13 @@
+{
+
+    "On Hold Requests":"On Hold Requests",
+    "Today Requests":"Today  Requests",
+    "Open Requests":"Open Requests",
+    "Unassigned Requests":"Unassigned Requests",
+    "Completed Requests":"Completed Requests",
+    "Resolved Requests":"Resolved Requests",
+
+    "InProgress Requests":"InProgress Requests",
+    "Requests Received in last 20 days":"Requests Received in last 20 days",
+    "Requests Completed in last 20 days":"Requests Completed in last 20 days"
+}

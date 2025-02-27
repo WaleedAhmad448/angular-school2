@@ -1,0 +1,20 @@
+ARG NODE_IMAGE=node:20-alpine
+ARG BRANCH_NG_ENV
+FROM ${NODE_IMAGE} as node-build
+WORKDIR /web/src
+COPY . .
+ENV BRANCH_NG_ENV=fileware-web-app
+
+# COPY ./.npmrc ./
+# COPY ./.yarnrc.yml ./
+# RUN cd saned-shared-lib && yarn --cache-folder /.yarn-cache && npm run build
+# RUN yarn --ignore-engines --cache-folder /.yarn-cache
+RUN npm ci
+RUN npm run build:fileware-web-app
+# RUN npm run build:${BRANCH_NG_ENV}
+
+FROM nginx:latest AS nginx-build
+WORKDIR /
+COPY ./nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf
+COPY --from=node-build /web/src/dist/fileware-web-app /usr/share/nginx/html
+# COPY --from=node-build /web/src/dist/${BRANCH_NG_ENV} /usr/share/nginx/html

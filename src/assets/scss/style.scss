@@ -1,0 +1,349 @@
+
+// control theme colors from here - you can add more variables from "_variables.scss"
+$primary: #12123B;
+$secondary: #0971CE;
+$success: #00C189;
+$enable-negative-margins: true;
+$border-radius: 4px;
+$control-height: 46px;
+$enable-negative-margins: true;
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1200px,
+  xxl: 1400px
+);
+$headings-margin-bottom: 1rem;
+$enable-cssgrid: false;
+$font-family-base: 'Source Serif Pro';
+@import "flags";
+// @import "bootstrap/bootstrap";  // v5.3.0 // local version so you can control imported components - please remove any unused components u don't need.
+
+.flag{
+    width: 1.33333333em;
+    height: 0.9em;
+}
+.main-wrapper {
+  height: 100vh;
+}
+
+.section {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.bg-freeform-gradient-1{
+  background-color:hsla(0,0%,100%,1);
+  background-image:
+  radial-gradient(at 66% 30%, hsla(201,58%,95%,1) 0px, transparent 50%),
+  radial-gradient(at 89% 80%, hsla(213,57%,84%,1) 0px, transparent 50%),
+  radial-gradient(at 44% 55%, hsla(210,38%,94%,1) 0px, transparent 50%),
+  radial-gradient(at 87% 21%, hsla(207,46%,75%,1) 0px, transparent 50%),
+  radial-gradient(at 10% 79%, hsla(227,57%,91%,1) 0px, transparent 50%),
+  radial-gradient(at 9% 20%, hsla(201,62%,86%,1) 0px, transparent 50%);
+}
+
+.bg-freeform-gradient{
+  background-color:hsla(0,0%,100%,1);
+  background-image:
+  radial-gradient(at 9% 50%, hsla(198,49%,87%,1) 0px, transparent 50%),
+  radial-gradient(at 61% 53%, hsla(228,72%,95%,1) 0px, transparent 50%),
+  radial-gradient(at 90% 13%, hsla(202,63%,86%,1) 0px, transparent 50%),
+  radial-gradient(at 44% 21%, hsla(201,58%,95%,1) 0px, transparent 50%),
+  radial-gradient(at 5% 12%, hsla(222,28%,95%,1) 0px, transparent 50%),
+  radial-gradient(at 46% 45%, hsla(227,57%,91%,1) 0px, transparent 50%),
+  radial-gradient(at 10% 90%, hsla(207,44%,75%,1) 0px, transparent 50%),
+  radial-gradient(at 85% 84%, hsla(223,55%,85%,1) 0px, transparent 50%);
+}
+.text-color1{
+  color: #7CB8FF;
+}
+.text-color1.not-active{
+  color: #7CB8FF !important;
+}
+.dark{
+  .text-color1{
+    color: #f1f4f670;
+  }
+  .text-color1:focus{
+    color: #f1f4f670;
+  }
+  .nav-pills .nav-link.active, .nav-pills .show > .nav-link{
+    background-color: inherit;
+  }
+}
+.text-color1:hover{
+  color: #fff;
+}
+.text-color1:focus{
+  color: #7CB8FF;
+}
+
+.fs-1{
+  font-size: 1em;
+}
+
+.fs-2{
+  font-size: 2em;
+}
+
+.fs-3{
+  font-size: 3em;
+}
+
+.fs-4{
+  font-size: 4em;
+}
+
+.fs-5{
+  font-size: 5em;
+}
+
+.fs-6{
+  font-size: 6em;
+}
+
+.fs-7{
+  font-size: 7em;
+}
+
+.fs-8{
+  font-size: 8em;
+}
+
+.fs-9{
+  font-size: 9em;
+}
+
+.hover-x-10{
+  transition: all .5s ease-in-out;
+  &:hover,
+  &:focus{
+      transform: translateX(-10px);
+  }
+}
+.hover-y-10{
+  transition: all .5s ease-in-out;
+  &:hover,
+  &:focus{
+      transform: translateY(-10px);
+  }
+}
+.hover-x-5{
+  transition: all .5s ease-in-out;
+  &:hover,
+  &:focus{
+      transform: translateX(-5px);
+  }
+}
+.hover-y-5{
+  transition: all .5s ease-in-out;
+  &:hover,
+  &:focus{
+      transform: translateY(-5px);
+  }
+}
+.img-50{
+  width: 50px !important;
+}
+.img-60{
+  width: 60px !important;
+}
+.img-70{
+  width: 70px !important;
+}
+.img-80{
+  width: 80px !important;
+}
+.img-90{
+  width: 90px !important;
+}
+.img-100{
+  width: 100px !important;
+}
+.img-110{
+  width: 110px !important;
+}
+.img-120{
+  width: 120px !important;
+}
+.h-120{
+  height: 120px !important;
+}
+.h-110{
+  height: 110px !important;
+}
+.h-100px{
+  height: 100px !important;
+}
+.h-90{
+  height: 90px !important;
+}
+.h-80{
+  height: 80px !important;
+}
+.h-70{
+  height: 70px !important;
+}
+
+.bg-success-light{
+  background: #ECFDF3 !important;
+}
+.bg-primary-light{
+  background: #EEF4FF !important;
+}
+.bg-secondary-light{
+  background: #EFF8FF !important;
+}
+.bg-danger-light{
+  background: #FDF2FA !important;
+}
+.bg-warning-light{
+  background: #FFF6ED !important;
+}
+
+/* Close Sidebar Icon */
+.close-sidebar-btn {
+    position: fixed;
+    z-index: 1000;
+    left: 4rem;
+    top: 60px;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    background-color: #205FFF;
+    transition: all 0.2s;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    transition: "background-color" 0.2s;
+  }
+  .close-sidebar-btn:hover {
+    background-color: #163178;
+  }
+
+  .close-sidebar-btn.is-active {
+    left: 67px;
+  }
+  .close-sidebar-btn.is-active i {
+    transform: rotate(180deg);
+  }
+
+  .close-sidebar-btn i {
+    color: #fff;
+  }
+
+  /* Sidebar */
+  .closed-sidebar .app-sidebar:hover {
+    width: unset !important;
+  }
+
+  .closed-sidebar .app-sidebar .app-sidebar__inner .metismenu-icon {
+    text-indent: 0 !important;
+    left: 50% !important;
+    margin-left: -10px !important;
+  }
+
+  .closed-sidebar .app-sidebar:hover .app-sidebar__inner ul li a,
+  .closed-sidebar .app-sidebar:hover .app-sidebar__inner .app-sidebar__heading {
+    text-indent: -99rem;
+    padding: 0;
+  }
+
+  .closed-sidebar .app-sidebar .app-sidebar__inner .app-sidebar__heading {
+    margin-inline-start: 20px;
+  }
+
+  .app-sidebar .app-sidebar__inner .app-sidebar__heading svg {
+    display: none;
+  }
+
+  .closed-sidebar .app-sidebar .app-sidebar__inner .app-sidebar__heading svg {
+    display: block;
+  }
+
+  .closed-sidebar .app-sidebar .app-sidebar__inner .app-sidebar__heading::before {
+    display: none;
+  }
+
+  .closed-sidebar li.mm-active {
+    background-color: #205FFF;
+    border-radius: .25rem;
+  }
+
+  .layout-static{
+    .close-sidebar-btn{
+        left: 17rem !important;
+    }
+    .close-sidebar-btn{
+        i.pi-angle-right:before {
+        content: "\e931";
+        }
+    }
+  }
+  @media screen and (max-width: 991px){
+    .close-sidebar-btn{
+        display: none;
+    }
+  }
+  .layout-sidebar .layout-menu ul a {
+    margin: 0.5rem !important;
+    border-radius: var(--border-radius);
+  }
+  .layout-sidebar .layout-menu ul a.active-route {
+    font-weight: 700;
+    background-color: var(--menuitem-hover-bg-color);
+  }
+  .layout-container.layout-slim .layout-menu .layout-root-menuitem > a.active-route {
+    // background-color: var(--menuitem-hover-bg-color);
+    background-color: #12123b;
+    .layout-menuitem-icon{
+      color: white;
+
+    }
+
+}
+
+.layout-sidebar{
+    .layout-menu-container{
+        &::-webkit-scrollbar {
+            width: 6px;
+          }
+
+        &::-webkit-scrollbar-track {
+            background-color: #e4e4e4;
+            border-radius: 6px;
+          }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 6px;
+          }
+    }
+}
+
+.min-w-20rem{
+    min-width: 20rem;
+}
+
+.bg-off-white{
+  // background:  linear-gradient(to left top, var(--primary-400), var(--primary-500), var(--primary-600));
+background:  #f8fafc !important;
+
+}
+.bg-gray-custom{
+  background: #eff0f6 !important;
+
+}
+
+
+
+.bg-header-container{
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(25px);
+}

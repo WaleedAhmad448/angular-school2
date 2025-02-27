@@ -1,0 +1,14 @@
+<div class="relative">
+    <div class="p-4">
+        <kitsng-form-factory
+        [form]="form"
+        [fields]="fields"
+      ></kitsng-form-factory>
+    </div>
+  <div class="bottom-0 pb-3 fixed px-3 left-0 w-full">
+    <div class="flex justify-content-end">
+      <p-button type="submit" label="{{item?'Update':'Submit'}}" (click)="submit($event)" [disabled]="form.disabled" [loading]="form.disabled"></p-button>
+      <p-button type="button" label="Close" styleClass="p-button-outlined p-button-info mx-2" (onClick)="ref.close()"  [disabled]="form.disabled"></p-button>
+    </div>
+  </div>
+</div>

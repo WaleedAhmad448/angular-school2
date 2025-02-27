@@ -1,0 +1,22 @@
+<button type="button" class="btn-icon btn-icon-only close-sidebar-btn hamburger--elastic" data-class="closed-sidebar"
+(click)="toggleSidebar()">
+  <i class="pi pi-angle-right"></i>
+</button>
+<div class="layout-sidebar border-0" (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
+    <div class="sidebar-header p-1">
+        <!-- <a [routerLink]="['/']" class="app-logo">
+            <img src="assets/logo/{{platform}}-logo-full.svg" style="width: 150px;height: 40px;">
+            <svg width="21" height="22" viewBox="0 0 21 22" fill="none" xmlns="http://www.w3.org/2000/svg" class="app-logo-small">
+                <path d="M10.4851 0L0 20.9465H3.53702L10.4856 6.07843L17.2944 20.9465H20.9715L10.4851 0Z" fill="var(--logo-color)"/>
+                <path d="M13.8399 15.793L16.2076 21.0019H11.7681L13.8399 15.793Z" fill="var(--logo-color)"/>
+                <path d="M9.04637 21.0019L6.67867 15.793L4.60693 21.0019H9.04637Z" fill="var(--logo-color)"/>
+            </svg>
+        </a>
+        <button class="layout-sidebar-anchor p-link z-2 mb-2" type="button" (click)="anchor()"></button> -->
+    </div>
+
+
+    <div #menuContainer class="layout-menu-container">
+        <app-menu></app-menu>
+    </div>
+</div>

@@ -1,0 +1,75 @@
+<div class="header shadow-1">
+    <div
+      class="flex justify-content-between bg-of-white align-items-center px-4 surface-0 border-bottom-1 surface-border relative lg:static"
+      style="height: 60px"
+    >
+      <div class="flex align-items-center">
+        <!-- <div class="hidden lg:block">
+            <a
+              pripple=""
+              pstyleclass="#app-sidebar-1"
+              enterclass="hidden"
+              enteractiveclass="fadeinleft"
+              leavetoclass="hidden"
+              (click)="toggleSidebar()"
+              leaveactiveclass="fadeoutleft"
+              class="p-ripple p-element cursor-pointer inline-flex align-items-center justify-content-center text-700 mr-3"
+              ><i class="pi pi-bars text-4xl"></i><span class="p-ink"></span></a
+            >
+        </div> -->
+        <div class="sidebar-header p-3">
+            <a [routerLink]="['/']" class="app-logo">
+                <img src="assets/logo/{{platform}}-logo-full.svg" style="width: 150px;height: 40px;">
+                <svg width="21" height="22" viewBox="0 0 21 22" fill="none" xmlns="http://www.w3.org/2000/svg" class="app-logo-small">
+                    <path d="M10.4851 0L0 20.9465H3.53702L10.4856 6.07843L17.2944 20.9465H20.9715L10.4851 0Z" fill="var(--logo-color)"/>
+                    <path d="M13.8399 15.793L16.2076 21.0019H11.7681L13.8399 15.793Z" fill="var(--logo-color)"/>
+                    <path d="M9.04637 21.0019L6.67867 15.793L4.60693 21.0019H9.04637Z" fill="var(--logo-color)"/>
+                </svg>
+            </a>
+            <!-- <button class="layout-sidebar-anchor p-link z-2 mb-2" type="button" (click)="anchor()"></button> -->
+        </div>
+        <a
+          pripple=""
+          pstyleclass="#app-sidebar-1"
+          enterclass="hidden"
+          enteractiveclass="fadeinleft"
+          leavetoclass="hidden"
+          (click)="toggle()"
+          leaveactiveclass="fadeoutleft"
+          class="p-ripple p-element cursor-pointer inline-flex align-items-center justify-content-center lg:hidden text-700 mr-3"
+          ><i class="pi pi-bars text-4xl"></i><span class="p-ink"></span></a
+        >
+        <span class="p-input-icon-left"
+          ><i class="pi pi-search"></i
+          ><input
+            type="text"
+            pinputtext=""
+            placeholder="Search"
+            class="p-inputtext p-component p-element border-none w-10rem sm:w-20rem"
+        /></span>
+      </div>
+      <a
+        pripple=""
+        pstyleclass="@next"
+        enterclass="hidden"
+        enteractiveclass="fadein"
+        leavetoclass="hidden"
+        leaveactiveclass="fadeout"
+        class="p-ripple p-element cursor-pointer block lg:hidden text-700"
+        ><i class="pi pi-ellipsis-v text-2xl"></i><span class="p-ink"></span
+      ></a>
+      <ul
+        class="gap-2 list-none p-0 m-0 hidden lg:flex lg:align-items-center select-none lg:flex-row surface-section border-1 lg:border-none surface-border right-0 top-100 z-1 shadow-2 lg:shadow-none absolute lg:static"
+      >
+        <li class="border-top-1 surface-border lg:border-top-none">
+            <app-language></app-language>
+        </li>
+        <li class="border-top-1 surface-border lg:border-top-none">
+            <app-notification></app-notification>
+        </li>
+        <li class="border-top-1 surface-border lg:border-top-none">
+          <app-user></app-user>
+        </li>
+      </ul>
+    </div>
+</div>

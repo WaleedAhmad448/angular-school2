@@ -1,0 +1,27 @@
+<!-- <p-confirmDialog></p-confirmDialog> -->
+
+<div class="layout-container " [ngClass]="containerClass">
+    <app-header></app-header>
+     <app-sidebar></app-sidebar>
+     <div class="layout-content-wrapper">
+        <app-topbar></app-topbar>
+        <a [href]="linkMeet">
+          <p-button
+          *ngIf="isMeet"
+          icon="pi pi-video
+
+          "
+          [label]="( userName + ' Call You ')" rounded="true" severity="warning"  styleClass="jumping-button fixed bottom-0 my-2 bg-white-alpha-90	 z-3	border-round-3xl text-red-700 border-0	 shadow-1" >
+        </p-button>
+        </a>
+
+
+        <!-- <app-breadcrumb class="content-breadcrumb"></app-breadcrumb> -->
+        <div class="layout-content">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+    <!-- <app-profilemenu></app-profilemenu> -->
+    <!-- <app-config></app-config> -->
+    <div class="layout-mask"></div>
+</div>

@@ -1,0 +1,114 @@
+<ng-template #testPageTableEmptyRef>
+    <tr>
+        <td colspan="10">
+            <h3 class="text-danger">No Data Found Custom template</h3>
+        </td>
+    </tr>
+</ng-template>
+
+<ng-template
+    #imageCustomTemplateRef
+    let-value
+    let-column="column"
+    let-item="rowData"
+>
+    <ng-container *ngIf="value; else noImage">
+        <p-avatar
+            [image]="apiBaseUrl + value"
+            size="large"
+            shape="circle"
+        ></p-avatar>
+    </ng-container>
+    <ng-template #noImage>
+        <p-avatar
+            size="large"
+            [label]="item['theName'] | initials"
+            [styleClass]="0 | randomBgColor"
+            shape="circle"
+        ></p-avatar>
+    </ng-template>
+</ng-template>
+
+<ng-template
+    #assetImageCustomTemplateRef
+    let-value
+    let-column="column"
+    let-item="rowData"
+>
+    <ng-container *ngIf="value && value != 'null'">
+        <p-avatar [image]="apiBaseUrl + value" size="xlarge"></p-avatar>
+    </ng-container>
+</ng-template>
+
+<ng-template
+    #assetStatusCustomTemplateRef
+    let-value
+    let-column="column"
+    let-item="rowData"
+>
+    <ng-container *ngIf="value && value != 'null'">
+        <p-tag
+            [severity]="value == 'Available' ? 'success' : undefined"
+            value="{{ value }}"
+            [rounded]="true"
+        ></p-tag>
+    </ng-container>
+</ng-template>
+
+<ng-template #statuscustomTemplateRef let-x>
+    <p-message
+        [severity]="x ? 'success' : 'error'"
+        styleClass="rounded-5 py-1"
+        [text]="x ? 'Enabled' : 'Disabled'"
+    ></p-message>
+</ng-template>
+<!-- <ng-template #statuscustomTemplateRef let-value>
+    <p-message [severity]="value ? 'success' :'error'" styleClass="rounded-5 py-1" [text]="value ? 'IsTheMainCenter' : 'IsNotTheMainCenter'" ></p-message>
+</ng-template> -->
+<!--
+<ng-template #testRef let-value let-column="column" let-item="rowData">
+    <h1>{{value}}</h1>
+</ng-template> -->
+
+<!-- // clinic Module templates -->
+
+<ng-template #yesNoCustomTemplateRef let-x>
+    <p-tag
+        [severity]="x ? 'success' : 'danger'"
+        [icon]="x ? 'pi pi-check' : 'pi pi-times'"
+        [value]="x ? 'Yes' : 'No'"
+        styleClass="rounded-5 py-1"
+    ></p-tag>
+</ng-template>
+
+<ng-template
+    #pastHistoryTemplateRef
+    let-value
+    let-column="column"
+    let-item="rowData"
+>
+    <ng-container *ngIf="value?.length > 0; else noPastHistory">
+        <div
+            class="flex flex-wrap gap-1 align-items-center justify-content-center"
+        >
+            <ng-container *ngFor="let item of value ?? []">
+                <p-tag
+                    [value]="item"
+                    styleClass="rounded-5"
+                    *ngIf="item != 'others'"
+                ></p-tag>
+            </ng-container>
+        </div>
+    </ng-container>
+    <ng-template #noPastHistory>
+        <span>--- No Past {{ column?.field ?? "Data" | titlecase }} ---</span>
+    </ng-template>
+</ng-template>
+<ng-template #nullValueCustomTemplateRef let-value>
+    <ng-container *ngIf="value == null || value == ''">
+        <span>--------</span>
+    </ng-container>
+    <ng-container *ngIf="value">
+        <span>{{ value }}</span>
+    </ng-container>
+</ng-template>

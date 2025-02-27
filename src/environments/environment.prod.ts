@@ -1,7 +1,9 @@
-import packageInfo from '../../package.json';
-
 export const environment = {
-  production: true,
-  version: packageInfo.version,
-  config: '/assets/config-prod.json',
+    production: true,
+    logoPath: 'assets/images/logo/full-logo.svg',
+    apiBaseUrl: '',
+    apiUrl: "oig-saned.kitsys.co",
+    platform: 'kitsys',
+    devToken: '',
+    defaultTenant: '',
 };
