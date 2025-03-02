@@ -43,7 +43,9 @@ export class DynamicFormDialogComponent implements OnInit {
       this.item = this.refConfig.data?.item;
       this.updateFormValue();
     }
-    this.apiService._initService(this.pageConfig.module,this.pageConfig.entity, this.pageConfig.version);
+    this.apiService._initService(this.pageConfig.module, this.pageConfig.entity,
+      // this.pageConfig.version
+    );
   }
   submit(event: any){
     if (this.formConfig?.beforeSubmit) {

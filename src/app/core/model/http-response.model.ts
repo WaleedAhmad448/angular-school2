@@ -139,7 +139,7 @@ export const getBaseUrl = () => {
     origin = window.location.origin;
   } else {
     const tenant = getTenantFromSubdomain();
-    origin = `https://${tenant}.${environment.apiUrl}`;
+    origin = `https://${tenant}.${environment.apiBaseUrl}`;
   }
   return `${origin}`;
 };
@@ -149,7 +149,7 @@ export const getTenantFromSubdomain = () => {
   if (subdomainList.length > 1) {
     return subdomainList[0];
   } else {
-    return environment.defaultTenant;
+    return environment.apiBaseUrl;
   }
 };
 export const appendToFormData = (

@@ -47,7 +47,7 @@ export class PageListCoreComponent implements OnInit, OnDestroy {
       this.apiService._initService(
         this.pageConfig.module,
         this.pageConfig.entity,
-        this.pageConfig.version
+        // this.pageConfig.version
       );
       this.subscribeToData();
     });

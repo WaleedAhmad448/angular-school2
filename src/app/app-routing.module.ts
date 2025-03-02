@@ -5,6 +5,8 @@ import { DimensionsResolver } from './modules/pages/dimensions/dimensions.resolv
 import { DocTypesResolver } from './modules/pages/docTypes/doc-types.resolver';
 import { DocTypeAgesResolver } from './modules/pages/docTypeAges/doc-type-ages.resolver';
 import { ArchiveTypesResolver } from './modules/pages/archiveTypes/archive-types.resolver';
+import { StudentResolver } from './modules/pages/student/student.resolver';
+import { StudentComponent } from './modules/pages/student/student.component';
 
 const routerOptions: ExtraOptions = {
     anchorScrolling: 'enabled',
@@ -36,6 +38,22 @@ const routes: Routes = [
                         './modules/page-list-factory/page-list-factory.module'
                     ).then((m) => m.PageListFactoryModule),
                 resolve: { pageConfig: DocTypesResolver },
+            },
+                        {
+                path: 'student',
+                loadChildren: () =>
+                    import(
+                        './modules/page-list-factory/page-list-factory.module'
+                    ).then((m) => m.PageListFactoryModule),
+                resolve: { pageConfig: StudentResolver },
+            },
+
+              {
+                path: 'students',
+                component: StudentComponent,
+                resolve: {
+                pageConfig: StudentResolver
+                }
             },
 
             {

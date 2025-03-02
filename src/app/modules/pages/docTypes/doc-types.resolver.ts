@@ -246,7 +246,7 @@ export const DocTypesResolver: ResolveFn<PageListOptions> = (route, state) => {
         route: 'docTypes',
         module: ModulesNames.FileWare,
         entity: EntitiesNames.docTypes,
-        version: 'v1',
+        // version: 'v1',
         filters: filters,
         headerOptions: headerOptions,
         formConfig: formConfig,

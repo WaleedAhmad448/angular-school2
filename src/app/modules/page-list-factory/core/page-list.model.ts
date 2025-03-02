@@ -50,7 +50,7 @@ export interface PageListOptions<T = any> {
   route: string;
   module: string;
   entity: string;
-  version: string;
+  // version: string;
   headerOptions: PageHeaderOptions;
   tableConfig: KitsngTableConfig;
   formConfig: FormConfig<T>;

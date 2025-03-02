@@ -243,7 +243,7 @@ export const DimensionsResolver: ResolveFn<PageListOptions> = (
         route: 'dimensions',
         module: ModulesNames.FileWare,
         entity: EntitiesNames.dimensions,
-        version: 'v1',
+        // version: 'v1',
         filters: filters,
         headerOptions: headerOptions,
         formConfig: formConfig,
