@@ -1,6 +1,6 @@
 export enum ModulesNames {
     FileWare = 'KitsysFileware',
-    Student= 'Student'
+    Student= 'students'
 }
 export enum EntitiesNames {
     test = 'Test',

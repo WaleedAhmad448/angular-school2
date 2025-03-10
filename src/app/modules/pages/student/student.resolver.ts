@@ -17,7 +17,7 @@ import { StudentService } from 'src/app/core/service/student.service';
 
 export const StudentResolver: ResolveFn<PageListOptions> = (route, state) => {
     const ctxService = inject(ContextService);
-    const studentService = inject(StudentService); // استدعاء خدمة الطلاب
+    // const studentService = inject(StudentService); // استدعاء خدمة الطلاب
 
     // إعداد حقول النموذج
     let formFields: KitsngFormFactoryModel[] = [
