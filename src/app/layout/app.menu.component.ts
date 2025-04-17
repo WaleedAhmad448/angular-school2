@@ -15,18 +15,18 @@ export class AppMenuComponent implements OnInit, AfterViewInit {
     ngOnInit() {
         console.log('role from app menu', this.isAdmin);
         this.model = [
-            // {
-            //     label: 'Empty',
-            //     icon: 'pi pi-home',
-            //     items: [
-            //         {
-            //             label: 'Empty Page',
-            //             icon: 'pi pi-fw pi-home',
-            //             routerLink: ['/'],
-            //         },
-            //     ],
-            //     role: this.isAdmin,
-            // },
+            {
+                label: 'Empty',
+                icon: 'pi pi-home',
+                items: [
+                    {
+                        label: 'Empty Page',
+                        icon: 'pi pi-fw pi-home',
+                        routerLink: ['/'],
+                    },
+                ],
+                role: this.isAdmin,
+            },
 
             {
                 label: 'Dimensions',

@@ -1,53 +1,57 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from './api.service';
+import { Student, StudentRegistrationDto } from '../model/student.model';
+import { ApiQueryDto, ApiListDto } from '../model/http-response.model';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { ApiListDto } from '../model/http-response.model'; // ✅ استيراد النوع
 
 @Injectable({
   providedIn: 'root',
 })
 export class StudentService {
-  constructor(private apiService: ApiService<any>) {
-    this.apiService._initService('students', '');
+  private service: ApiService<Student>;
+
+  constructor(private api: ApiService<Student>) {
+    this.service = api;
+    this.service._initService('school', 'student'); // مسار: /api/default/school/student
   }
 
-  // جلب جميع الطلاب
-  getStudents(): Observable<any[]> {
-    return this.apiService.getAll({}).pipe(
-      map((response: ApiListDto<any>) => response.items) // ✅ تحويل ApiListDto إلى any[]
-    );
+  getAllStudents(query: ApiQueryDto): Observable<ApiListDto<Student>> {
+    return this.service.getAll(query);
   }
 
-  // جلب طالب واحد بواسطة الـ ID
-  getStudentById(id: number): Observable<any> {
-    return this.apiService.getById(id.toString());
+  getPagedStudents(query: ApiQueryDto): Observable<ApiListDto<Student>> {
+    return this.service.getPaged(query);
   }
 
-  // إضافة طالب جديد
-  addStudent(student: any): Observable<any> {
-      const formData = new FormData();
-      formData.append('name', student.name);
-      formData.append('age', student.age);
-
-      return this.apiService.fetchData('POST', 'students', formData, 'FormData'); // ✅ المسار الصحيح
+  getStudentById(id: number): Observable<Student> {
+    return this.service.getById(id.toString());
   }
 
-  addStudentWithImage(student: any, imageFile: File): Observable<any> {
-    const formData = new FormData();
-    formData.append('name', student.name);
-    formData.append('age', student.age);
-    formData.append('image', imageFile); // ✅ إضافة الصورة
-
-    return this.apiService.fetchData('POST', 'students', formData, 'FormData'); // ✅ المسار الصحيح
-  }
-  // تحديث بيانات طالب
-  updateStudent(id: number, student: any): Observable<any> {
-    return this.apiService.edit(student);
+  addStudent(data: StudentRegistrationDto): Observable<Student> {
+    const student: Student = {
+      ...data,
+      id: 0, // Assign a default value or handle appropriately
+      studentNumber: '', // Assign a default value or handle appropriately
+      registrationDate: new Date(), // Assign a default value or handle appropriately
+    };
+    return this.api.add(student); // ملاحظة: هنا نستخدم api مباشرة لأن `data` من نوع DTO
   }
 
-  // حذف طالب
-  deleteStudent(id: number): Observable<any> {
-    return this.apiService.delete(id.toString());
+  updateStudent(id: number, data: StudentRegistrationDto): Observable<Student> {
+    const student: Student = {
+      ...data,
+      id: id, // Assign the ID from the parameter
+      studentNumber: '', // Assign a default value or handle appropriately
+      registrationDate: new Date(), // Assign a default value or handle appropriately
+    }
+    return this.api.edit(student); // ملاحظة: هنا نستخدم api مباشرة لأن `data` من نوع DTO
+  }
+
+  deleteStudent(id: number) {
+    return this.service.delete(id.toString());
+  }
+
+  getLookupList(): Observable<ApiListDto<Student>> {
+    return this.service.getAsList();
   }
 }

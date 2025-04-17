@@ -5,8 +5,8 @@
 export const environment = {
     production: false,
     logoPath: 'assets/images/logo/full-logo.svg',
-    apiBaseUrl: 'http://localhost:8000/api/',
-    apiUrl:'https://localhost:7143/api/',
+    apiBaseUrl: 'http://localhost:5199/api/',
+    apiUrl:'https://localhost:5199/api/',
     platform: 'kitsys',
      };
 
