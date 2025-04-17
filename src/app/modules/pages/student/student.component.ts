@@ -22,15 +22,15 @@ export class StudentComponent implements OnInit {
   ngOnInit(): void {
     this.route.data.subscribe(data => {
       this.pageConfig = data['pageConfig']; // الحصول على إعدادات الصفحة
-      this.loadStudents();
+      // this.loadStudents();
     });
   }
 
-  loadStudents() {
-    this.studentService.getAll().subscribe(data => {
-      this.students = data;
-      this.pageConfig.tableConfig.data = this.students; // تحديث البيانات في تكوين الجدول
-      this.pageConfig.tableConfig.totalRecords = this.students.length; // تحديث العدد الكلي للسجلات
-    });
-  }
+  // loadStudents() {
+  //   this.studentService.getAll().subscribe(data => {
+  //     this.students = data;
+  //     this.pageConfig.tableConfig.data = this.students; // تحديث البيانات في تكوين الجدول
+  //     this.pageConfig.tableConfig.totalRecords = this.students.length; // تحديث العدد الكلي للسجلات
+  //   });
+  // }
 }

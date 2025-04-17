@@ -2,8 +2,8 @@ export const environment = {
     production: true,
     logoPath: 'assets/images/logo/full-logo.svg',
     apiBaseUrl: '',
-    // apiUrl: "oig-saned.kitsys.co",
+    apiUrl: "http://localhost:8000/api/",
     platform: 'kitsys',
     // devToken: '',
-    // defaultTenant: '',
+    defaultTenant: 'http://localhost:8000/api/',
 };

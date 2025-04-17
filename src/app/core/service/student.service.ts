@@ -1,35 +1,53 @@
-// src/app/core/service/student.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { ApiService } from './api.service';
 import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment';
-import { Student } from '../model/student.model';
+import { map } from 'rxjs/operators';
+import { ApiListDto } from '../model/http-response.model'; // ✅ استيراد النوع
 
 @Injectable({
   providedIn: 'root',
 })
 export class StudentService {
-  private apiUrl = `${environment.apiBaseUrl}/students`;
-
-  constructor(private http: HttpClient) {}
-
-  getAll(): Observable<Student[]> {
-    return this.http.get<Student[]>(this.apiUrl);
+  constructor(private apiService: ApiService<any>) {
+    this.apiService._initService('students', '');
   }
 
-  getById(id: number): Observable<Student> {
-    return this.http.get<Student>(`${this.apiUrl}/${id}`);
+  // جلب جميع الطلاب
+  getStudents(): Observable<any[]> {
+    return this.apiService.getAll({}).pipe(
+      map((response: ApiListDto<any>) => response.items) // ✅ تحويل ApiListDto إلى any[]
+    );
   }
 
-  create(student: Student): Observable<Student> {
-    return this.http.post<Student>(this.apiUrl, student);
+  // جلب طالب واحد بواسطة الـ ID
+  getStudentById(id: number): Observable<any> {
+    return this.apiService.getById(id.toString());
   }
 
-  update(student: Student): Observable<Student> {
-    return this.http.put<Student>(`${this.apiUrl}/${student.id}`, student);
+  // إضافة طالب جديد
+  addStudent(student: any): Observable<any> {
+      const formData = new FormData();
+      formData.append('name', student.name);
+      formData.append('age', student.age);
+
+      return this.apiService.fetchData('POST', 'students', formData, 'FormData'); // ✅ المسار الصحيح
   }
 
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  addStudentWithImage(student: any, imageFile: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('name', student.name);
+    formData.append('age', student.age);
+    formData.append('image', imageFile); // ✅ إضافة الصورة
+
+    return this.apiService.fetchData('POST', 'students', formData, 'FormData'); // ✅ المسار الصحيح
+  }
+  // تحديث بيانات طالب
+  updateStudent(id: number, student: any): Observable<any> {
+    return this.apiService.edit(student);
+  }
+
+  // حذف طالب
+  deleteStudent(id: number): Observable<any> {
+    return this.apiService.delete(id.toString());
   }
 }

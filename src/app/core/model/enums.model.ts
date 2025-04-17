@@ -8,5 +8,5 @@ export enum EntitiesNames {
     docTypes = 'DocTypes',
     docTypeAges = 'DocTypeAges',
     archiveTypes = 'ArchiveTypes',
-    studentService= 'StudentService'
+    Student= 'Student'
 }
