@@ -1,7 +1,7 @@
 {
   "name": "angular-school",
   "version": "18.0.1",
-   "scripts": {
+  "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",

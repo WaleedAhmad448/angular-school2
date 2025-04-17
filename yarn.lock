@@ -3396,7 +3396,7 @@ chrome-trace-event@^1.0.2:
 
 "ckeditor5-custom-build@file:./ckeditor5-custom-build-0.0.1.tgz":
   version "0.0.1"
-  resolved "file:ckeditor5-custom-build-0.0.1.tgz"
+  resolved "file:../../../ckeditor5-custom-build-0.0.1.tgz"
   integrity sha512-WcL52fSOmCojDlTH5CYnAacrfIsisyH3ZSNuxr+l4+8Q1R4Ir/Ori2iuQA9ldUqlgo8ZpgP5+Vs13WdAFyV3OA==
   dependencies:
     "@ckeditor/ckeditor5-autoformat" "39.0.1"
@@ -6099,14 +6099,14 @@ kind-of@^6.0.2:
 
 "kitsng-form-factory@file:./kitsng-form-factory-0.3.19.tgz":
   version "0.3.19"
-  resolved "file:kitsng-form-factory-0.3.19.tgz"
+  resolved "file:../../../kitsng-form-factory-0.3.19.tgz"
   integrity sha512-45ZADDaXP8EDDfGb0BZmyBnTuBKbZDuwxEoHFxdbsNWwFi7/31kAiI3YwQk91P3QBR1+sFH3beHmJ7WtWHqbOQ==
   dependencies:
     tslib "^2.3.0"
 
 "kitsng-table-factory@file:./kitsng-table-factory-0.3.10.tgz":
   version "0.3.10"
-  resolved "file:kitsng-table-factory-0.3.10.tgz"
+  resolved "file:../../../kitsng-table-factory-0.3.10.tgz"
   integrity sha512-0cgfJvHOtvfqqOTnF6kWVr0faqgMCmoEGa3y+7QJIsW5TUFNx/lCzeizYe3/qddoI/QF7RfjMcCaRjwmLy6f7A==
   dependencies:
     tslib "^2.3.0"
@@ -8023,7 +8023,7 @@ safer-buffer@^2.0.2, safer-buffer@^2.1.0, "safer-buffer@>= 2.1.2 < 3", "safer-bu
 
 "saned-shared-lib@file:./saned-shared-lib-18.0.2.tgz":
   version "18.0.2"
-  resolved "file:saned-shared-lib-18.0.2.tgz"
+  resolved "file:../../../saned-shared-lib-18.0.2.tgz"
   integrity sha512-JuMM5TUYi0AhBVL58jgPg6Ovr4CXkk2p1AqVqzvnQyFwCKwrs1/PkJ/hDVEJIMFTTG5YrzxS9ZDF/KVwo4UGjA==
   dependencies:
     tslib "^2.3.0"
