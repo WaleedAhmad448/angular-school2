@@ -5,8 +5,8 @@ import { DimensionsResolver } from './modules/pages/dimensions/dimensions.resolv
 import { DocTypesResolver } from './modules/pages/docTypes/doc-types.resolver';
 import { DocTypeAgesResolver } from './modules/pages/docTypeAges/doc-type-ages.resolver';
 import { ArchiveTypesResolver } from './modules/pages/archiveTypes/archive-types.resolver';
-import { StudentComponent } from './modules/pages/student/student.component';
-import { StudentResolver } from './modules/pages/student/student.resolver';
+// import { StudentComponent } from './modules/pages/student/student.component';
+// import { StudentResolver } from './modules/pages/student/student.resolver';
 
 const routerOptions: ExtraOptions = {
     anchorScrolling: 'enabled',
@@ -40,23 +40,29 @@ const routes: Routes = [
                 resolve: { pageConfig: DocTypesResolver },
             },
                         
+            // {
+            //     path: 'student',
+            //     loadChildren: () =>
+            //         import(
+            //             './modules/page-list-factory/page-list-factory.module'
+            //         ).then((m) => m.PageListFactoryModule),
+            //     resolve: { pageConfig: StudentResolver },
+            // },
+
+            //   {
+            //     path: 'student',
+            //     component: StudentComponent,
+            //     resolve: {
+            //     pageConfig: StudentResolver
+            //     }
+            // },
             {
                 path: 'student',
                 loadChildren: () =>
-                    import(
-                        './modules/page-list-factory/page-list-factory.module'
-                    ).then((m) => m.PageListFactoryModule),
-                resolve: { pageConfig: StudentResolver },
-            },
-
-              {
-                path: 'student',
-                component: StudentComponent,
-                resolve: {
-                pageConfig: StudentResolver
-                }
-            },
-
+                    import('./modules/pages/student/student-routing.module').then(
+                        (m) => m.StudentRoutingModule
+                    ),
+                },
             {
                 path: 'doc-type-ages',
                 loadChildren: () =>

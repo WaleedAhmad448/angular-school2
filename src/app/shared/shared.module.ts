@@ -31,6 +31,7 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { KeyFilterModule } from 'primeng/keyfilter';
 import { ToolbarModule } from 'primeng/toolbar';
 import { TagModule } from 'primeng/tag';
+import { ToastModule } from 'primeng/toast';
 // others
 
 @NgModule({
@@ -66,6 +67,7 @@ import { TagModule } from 'primeng/tag';
     KeyFilterModule,
     ToolbarModule,
     TagModule,
+    ToastModule
   ],
   providers: [],
   exports: [
@@ -99,6 +101,7 @@ import { TagModule } from 'primeng/tag';
     KeyFilterModule,
     ToolbarModule,
     TagModule,
+    ToastModule,
     // PickListModule,
   ],
 })

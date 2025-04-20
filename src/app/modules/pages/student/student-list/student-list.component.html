@@ -1,0 +1,33 @@
+<app-page-heading *ngIf="headerOptions" [pageHeaderOptions]="headerOptions">
+</app-page-heading>
+<div class="card overflow-auto my-3 p-5 border-round-2xl">
+    <div class="flex flex-wrap justify-content-between align-items-center mb-2">
+        <div class="">
+            <h4>List of {{ headerOptions.title }}</h4>
+            <p>This is the paged list of {{ headerOptions.title }} in the system </p>
+        </div>
+        <div class="flex flex-wrap align-items-center gap-2">
+            <span class="p-input-icon-left">
+                <i class="pi pi-search"></i>
+                <input
+                    class="text-primary w-23rem"
+                    [(ngModel)]="query"
+                    (keydown)="search($event)"
+                    type="text"
+                    pInputText />
+            </span>
+            <a
+                href="javascript:void(0);"
+                class="text-primary cursor-pointer"
+                (click)="clearSearch()"
+                *ngIf="query != '' && query != null && query != undefined" >
+                <i class="pi pi-times"></i>
+            </a>
+        </div>
+    </div>
+    <div>
+        <kitsng-table-factory [tableConfig]="tableConfig">
+        </kitsng-table-factory>
+    </div>
+</div>
+<p-toast></p-toast>
