@@ -1,50 +1,40 @@
 import { Injectable } from '@angular/core';
-import { ApiService } from './api.service';
-import { Student, StudentRegistrationDto } from '../model/student.model';
-import { ApiListDto, ApiQueryDto } from '../model/http-response.model';
+import { ApiServices } from './api.services';
+import { Student } from '../model/student.model';
+import { StudentRegistrationDto } from '../model/student.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class StudentService {
-  constructor(private api: ApiService<Student>) {
-    this.api._initService('school', 'students'); // وحدة: school | الكيان: students
+
+  private endpoint = 'StudentRegistration'; // تأكد أنه يطابق مسار الـ API في الباكند
+
+  constructor(private api: ApiServices<Student>) {}
+  // this.http.get(`${environment.apiUrl}/OAuth/userinfo`)
+
+  getAllStudents(): Observable<Student[]> {
+    return this.api.getAll(this.endpoint);
   }
 
-  getAll(query: ApiQueryDto): Observable<ApiListDto<Student>> {
-    return this.api.getAll(query);
+  getStudentById(id: number): Observable<Student> {
+    return this.api.getById(this.endpoint, id);
   }
 
-  getPaged(query: ApiQueryDto): Observable<ApiListDto<Student>> {
-    return this.api.getPaged(query);
+  registerStudent(data: StudentRegistrationDto): Observable<Student> {
+    return this.api.create(this.endpoint, data as unknown as Student);
   }
 
-  getLookup(): Observable<ApiListDto<Student>> {
-    return this.api.getAsList();
+  updateStudent(id: number, data: StudentRegistrationDto): Observable<Student> {
+    return this.api.update(this.endpoint, id, data as unknown as Student);
   }
 
-  getById(id: string): Observable<Student> {
-    return this.api.getById(id);
+  deleteStudent(id: number): Observable<void> {
+    return this.api.delete(this.endpoint, id);
   }
 
-  add(student: StudentRegistrationDto): Observable<Student> {
-    return this.api.add(student as any);
-  }
-
-  update(student: Student): Observable<Student> {
-    return this.api.edit(student);
-  }
-
-  delete(id: string): Observable<Student> {
-    return this.api.delete(id);
-  }
-
-  addForm(student: StudentRegistrationDto): Observable<Student> {
-    return this.api.addForm(student as any);
-  }
-
-  updateForm(student: Student): Observable<Student> {
-    return this.api.editForm(student);
+  uploadStudentPhoto(studentId: number, file: File): Observable<any> {
+    return this.api.uploadFile(`${this.endpoint}/upload-photo`, file, { studentId });
   }
 }

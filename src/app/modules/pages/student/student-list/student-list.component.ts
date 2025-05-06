@@ -1,14 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { Route, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { KitsngTableConfig, KitsngTableFactoryModule } from 'kitsng-table-factory';
 import { MessageService } from 'primeng/api';
 import { debounceTime, Observable, Subject } from 'rxjs';
-import { ApiQueryDto, ContextService } from 'saned-shared-lib';
 import { PageHeadeingOptions, PageHeading } from 'src/app/common/page-heading/page-heading.component';
-import { ErrorHandlerService } from 'src/app/core/service/error-handler.service';
-import { StudentService } from 'src/app/core/service/student.service';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { Student } from 'src/app/core/model/student.model';
+import { StudentService } from 'src/app/core/service/student.service';
+import { ErrorHandlerService } from 'src/app/core/service/error-handler.service';
 
 @Component({
   selector: 'app-student-list',
@@ -19,44 +19,41 @@ import { SharedModule } from 'src/app/shared/shared.module';
   providers: [MessageService],
 })
 export class StudentListComponent implements OnInit {
-  ctxService = inject(ContextService);
-  studentService: StudentService = inject(StudentService);
-  router: Router = inject(Router);
+  studentService = inject(StudentService);
+  router = inject(Router);
 
-  query!: string;
+  students: Student[] = [];
+  query: string = '';
+
   _getData: Subject<void> = new Subject();
   getData$: Observable<void> = this._getData.asObservable();
 
   tableConfig!: KitsngTableConfig;
   headerOptions!: PageHeadeingOptions;
 
-  constructor(private errorHandlerService: ErrorHandlerService, private messageService: MessageService) {
+  constructor(
+    private errorHandlerService: ErrorHandlerService,
+    private messageService: MessageService
+  ) {
     this.initHeaderOptions();
     this.initTableConfig();
-    this.fetchStudentData();
   }
 
   ngOnInit(): void {
+    this._getData.pipe(debounceTime(500)).subscribe(() => {
+      this.fetchStudentsData();
+    });
     this._getData.next();
   }
 
-  fetchStudentData() {
-    this.getData$.pipe(debounceTime(500)).subscribe(() => {
-      const query: ApiQueryDto | any = {};
-      if (this.query != null || this.query != undefined) {
-        query['search'] = this.query;
+  fetchStudentsData() {
+    this.studentService.getAllStudents().subscribe({
+      next: (response: Student[]) => {
+        this.tableConfig.data = response;
+      },
+      error: (error) => {
+        this.errorHandlerService.handleError(error, this.messageService);
       }
-
-      this.studentService.getPaged(query).subscribe({
-        next: (response: any) => {
-          console.log('StudentData', response);
-          this.tableConfig.data = response.items;
-        },
-        error: (error) => {
-          console.log('Error Student Data', error);
-          this.errorHandlerService.handleError(error, this.messageService);
-        },
-      });
     });
   }
 
@@ -71,9 +68,11 @@ export class StudentListComponent implements OnInit {
 
   initHeaderOptions() {
     this.headerOptions = {
-      title: 'Student',
+      title: 'Students',
       containerClass: 'card mb-3 pb-3',
-      breadcrumbs: [{ label: 'Student' }],
+      breadcrumbs: [
+        { label: 'Students' },
+      ],
       actions: [
         {
           label: 'Add Student',
@@ -81,7 +80,7 @@ export class StudentListComponent implements OnInit {
           onClick: () => {
             this.router.navigate(['student', 'add']);
           },
-        },
+        }
       ],
     };
   }
@@ -89,15 +88,19 @@ export class StudentListComponent implements OnInit {
   initTableConfig() {
     this.tableConfig = {
       columns: [
-        { field: 'studentNumber', header: 'Student No.' },
         { field: 'fullName', header: 'Full Name' },
-        { field: 'gradeLevel', header: 'Grade' },
         { field: 'email', header: 'Email' },
         { field: 'phoneNumber', header: 'Phone' },
-        { field: 'registrationDate', header: 'Registered At' },
+        { field: 'gradeLevel', header: 'Grade' },
+        { field: 'parentName', header: 'Parent Name' },
+        { field: 'parentPhoneNumber', header: 'Parent Phone' },
+        { field: 'address', header: 'Address' },
+        { field: 'registrationDate', header: 'Registration Date' },
+        { field: 'studentNumber', header: 'Student Number' },
+        { field: 'dateOfBirth', header: 'Date of Birth' },
       ],
       data: [],
-      pageSize: 5,
+      pageSize: 10,
       first: 0,
       showPaginator: false,
       totalRecords: 0,
@@ -105,20 +108,20 @@ export class StudentListComponent implements OnInit {
       actionButtons: [
         {
           icon: 'pi pi-pencil',
-          onClick: (e) => {
-            this.router.navigate(['student', 'edit'], { state: e });
+          onClick: (student: Student) => {
+            this.router.navigate(['student', 'edit'], { state: student });
           },
           colorClass: 'p-button-info',
-        },
+        }
       ],
       onSelectedItems: (e) => {
-        console.log('onSelectedItems', e);
+        console.log('Selected students', e);
       },
       onSorting: (e) => {
-        console.log('onSorting', e);
+        console.log('Sorting', e);
       },
       onPageChanged: (e) => {
-        console.log('onPageChanged', e);
+        console.log('Page changed', e);
       },
     };
   }
