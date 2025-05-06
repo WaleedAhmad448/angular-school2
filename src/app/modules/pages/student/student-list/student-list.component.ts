@@ -46,16 +46,29 @@ export class StudentListComponent implements OnInit {
     this._getData.next();
   }
 
+  ngOnDestroy(): void {
+    this._getData.unsubscribe();
+  }
   fetchStudentsData() {
     this.studentService.getAllStudents().subscribe({
       next: (response: Student[]) => {
-        this.tableConfig.data = response;
+        if (this.query) {
+          const q = this.query.toLowerCase();
+          this.tableConfig.data = response.filter(student =>
+            student.fullName.toLowerCase().includes(q) ||
+            student.email.toLowerCase().includes(q) ||
+            student.studentNumber.toLowerCase().includes(q)
+          );
+        } else {
+          this.tableConfig.data = response;
+        }
       },
       error: (error) => {
         this.errorHandlerService.handleError(error, this.messageService);
       }
     });
   }
+  
 
   clearSearch() {
     this.query = '';

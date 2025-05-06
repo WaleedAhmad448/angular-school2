@@ -12,10 +12,13 @@ import {
     PageHeadeingOptions,
     PageHeading,
 } from 'src/app/common/page-heading/page-heading.component';
-
+import { EntitiesNames, ModulesNames } from 'src/app/core/model/enums.model';
 import { getBaseUrl } from 'src/app/core/model/http-response.model';
+
 import { ErrorHandlerService } from 'src/app/core/service/error-handler.service';
+import { HelperService } from 'src/app/core/service/helper.service';
 import { StudentService } from 'src/app/core/service/student.service';
+import { TemplateService } from 'src/app/core/service/template.service';
 import { SharedModule } from 'src/app/shared/shared.module';
 
 @Component({
@@ -39,14 +42,41 @@ export class StudentCreateComponent {
     form!: FormGroup;
     formFields: KitsngFormFactoryModel[] = [];
     headerOptions!: PageHeadeingOptions;
+    // const templateService = inject(TemplateService);
+    // const helperService = inject(HelperService);
     constructor(public formFactory: KitsngFormFactoryService,private studentService : StudentService,
-        private errorHandlerService: ErrorHandlerService, private messageService: MessageService) {
+        private errorHandlerService: ErrorHandlerService, private messageService: MessageService,
+      private templateService: TemplateService,
+      private helperService: HelperService
+    ) {
         this.checkPageUrl();
         this.initHeaderOptions();
         this.subscribeToStudentServices();
        
     }
     checkPageUrl() {
+        // if (this.pageUrl === 'edit') {
+        //     const studentData = history.state as any;
+        //     if (studentData && Object.keys(studentData).length > 0) {
+        //       this.mapFromApi(studentData);
+        //     } else {
+        //       this.router.navigate(['/student/student-list']); // رجوع لو ما في بيانات
+        //     }
+        //   }
+        // this.activeRoute.params.subscribe((params) => {
+        //     const studentId = params['id'];
+        //     if (studentId) {
+        //         this.studentService.getStudentById(studentId).subscribe({
+        //             next: (response) => {
+        //                 this.mapFromApi(response);
+        //             },
+        //             error: (error) => {
+        //                 this.errorHandlerService.handleError(error, this.messageService);
+        //             }
+        //         });
+        //     } 
+        // });
+        // Subscribe to the URL changes
         this.activeRoute.url.subscribe({
           next: (value) => {
             const urlPath = value.map((url) => url.path)[0];
@@ -66,10 +96,30 @@ export class StudentCreateComponent {
         });
       }
     private subscribeToStudentServices(){
+        this.studentService.getAllStudents().subscribe({
+            next:(response)=>{
+                this._arrayFormLength = response.length;
+                console.log(this._arrayFormLength);
+                this.initForm();
+            },
+            error:(error)=>{
+                this.errorHandlerService.handleError(error, this.messageService);
+            }
+        })
       
     
     }
     getItems(){
+        this.studentService.getAllStudents().subscribe({
+            next:(response)=>{
+                this._arrayFormLength = response.length;
+                console.log(this._arrayFormLength);
+                this.initForm();
+            },
+            error:(error)=>{
+                this.errorHandlerService.handleError(error, this.messageService);
+            }
+        })
       
     }
 
@@ -86,50 +136,106 @@ export class StudentCreateComponent {
         }
        }
     }
-    create(){
-        this.form.patchValue({
-            periodTotal:this._arrayFormLength,
-            periodType: this.form.value.periodType
-        });
-        this.studentService.registerStudent(this.form.value).subscribe({
-            next:(response)=>{
-                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Student Created Successfully' });
-                this.router.navigate(['student']);
-            },
-            error:(error)=>{
-                this.errorHandlerService.handleError(error, this.messageService);
-            }
-        })
-
-  
+    // create() {
+    //     const request = this.addMapToApi(this.form.value);
+    //     this.studentService.registerStudent(request).subscribe({
+    //       next: () => {
+    //         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Student created successfully' });
+    //         this.router.navigate(['/student/student-list']);
+    //       },
+    //       error: (error) => {
+    //         this.errorHandlerService.handleError(error, this.messageService);
+    //       }
+    //     });
+    //   }
+    create() {
+        const formData = this.form.value;
       
-    }
-    update(){
-        this.form.patchValue({
-            periodTotal:this._arrayFormLength,
-            periodType: this.form.value.periodType
+        const payload = {
+          registrationDto: {
+            ...formData,
+            dateOfBirth: new Date(formData.dateOfBirth).toISOString(),
+            registrationDate: new Date(formData.registrationDate).toISOString()
+          }
+        };
+      
+        this.form.disable(); // منع التعديل أثناء الإرسال
+      
+        this.studentService.createStudent(payload).subscribe({
+          next: (res) => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Student Created',
+              detail: 'Student has been registered successfully.'
+            });
+            this.router.navigate(['/student/student-list']);
+          },
+          error: (err) => {
+            this.form.enable(); // إعادة تفعيل النموذج إذا حصل خطأ
+            this.errorHandlerService.handleError(err, this.messageService);
+          }
         });
-        const studentId = this.form.value.id; // Assuming the form contains the student ID
-        this.studentService.updateStudent(studentId, this.form.value).subscribe({
-            next:(response)=>{
-                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Student Updated Successfully' });
-                this.router.navigate(['student']);
-            },
-            error:(error)=>{
-                this.errorHandlerService.handleError(error, this.messageService);
-            }
-        })
-       
-    }
-    editMapToApi(data: any){
-       
-    }
-    addMapToApi(data: any){
-     
-    }
-    mapFromApi(data : any){
-     
-       }
+      }
+      
+      
+    update() {
+        const request = this.editMapToApi(this.form.value);
+        this.studentService.updateStudent(this.form.value.id, request).subscribe({
+          next: () => {
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Student updated successfully' });
+            this.router.navigate(['/student/student-list']);
+          },
+          error: (error) => {
+            this.errorHandlerService.handleError(error, this.messageService);
+          }
+        });
+      }
+      
+    addMapToApi(data: any) {
+        return {
+          ...data,
+          createdAt: new Date().toISOString() // حسب ما يحتاجه الـ backend
+        };
+      }
+      
+      editMapToApi(data: any) {
+        return {
+          ...data,
+          updatedAt: new Date().toISOString()
+        };
+      }
+      
+      mapFromApi(data: any) {
+        this.form.patchValue({
+          fullName: data.fullName,
+          dateOfBirth: data.dateOfBirth,
+          studentNumber: data.studentNumber,
+          address: data.address,
+          phoneNumber: data.phoneNumber,
+          email: data.email,
+          gradeLevel: data.gradeLevel,
+          parentName: data.parentName,
+          parentPhoneNumber: data.parentPhoneNumber,
+          registrationDate: data.registrationDate
+        });
+      }
+        // ngOnInit() {
+        //     this.initForm();
+        //     this.initHeaderOptions();
+        //     if (this.pageUrl == 'edit') {
+        //     this.activeRoute.params.subscribe((params) => {
+        //         const studentId = params['id'];
+        //         this.studentService.getStudentById(studentId).subscribe({
+        //         next: (response) => {
+        //             this.mapFromApi(response);
+        //         },
+        //         error: (error) => {
+        //             this.errorHandlerService.handleError(error, this.messageService);
+        //         }
+        //         });
+        //     });
+        //     }
+        // }      
     scrollToFirstError() {
         const invalidElements =
           this.formContainerRef?.nativeElement?.querySelectorAll(":not(form).ng-invalid");
@@ -150,7 +256,7 @@ export class StudentCreateComponent {
             breadcrumbs: [
                 {
                   label: "Student",
-                  routerLink: "/finance/financial-periods"
+                  routerLink: "/student/student-list",
                 },
                 {
                     label: this.pageUrl=='edit' ? 'Update Student' :'Create New Student',
@@ -161,86 +267,268 @@ export class StudentCreateComponent {
     }
     initForm() {
         this.formFields = [
-            {
-                colSize: 'col-12 md:col-6',
-                controlType: 'dropdown',
-                options: {
-                    label: 'Period Type',
-                    formControlName: 'periodType',
-                    validators: { required: true },
-                    placeholder: 'Select Type',
-                    containerClass: 'align-items-center pl-4 sm:pl-6',
-                    controlLayout: 'horizontal',
-                    labelColSize: 'col-4',
-                    controlColSize: 'col-8',
-                    ngModelChange:(event)=> {
-                      if(event){
-                        this.initForm();
-                        this.form.patchValue({
-                        periodTotal:this._arrayFormLength,
-                        periodType: event
-                        });
-                        this.form.updateValueAndValidity();
-                      }
-                        
+                {
+                    controlType: 'input',
+                    colSize: 'col-12 md:col-6',
+                    options: {
+                        label: 'Full Name',
+                        formControlName: 'fullName',
+                        placeholder: 'Enter Full Name',
+                        containerClass: 'align-items-center pl-4 sm:pl-6',
+                        controlLayout: 'horizontal',
+                        labelColSize: 'col-4',
+                        controlColSize: 'col-8',
+                        validators: {
+                            required: true,
+                        },
                     },
                 },
-            },
-
-            {
-                colSize: 'col-12 md:col-6',
-                controlType: 'lookup-select',
-                options: {
-                    label: 'Year',
-                    formControlName: 'yearId',
-                    validators: { required: true },
-                    placeholder: 'Select Year',
-                    entity: 'students',
-                    apiBaseUrl: getBaseUrl(),
-                    containerClass: 'align-items-center pl-4 sm:pl-6',
-                    controlLayout: 'horizontal',
-                    labelColSize: 'col-4',
-                    controlColSize: 'col-8',
-                    ngModelChange:(event, parentFormGroup,selectedOption)=> {
-                        console.log(selectedOption);
-                        const endDateControl = parentFormGroup?.get('endDate');
-                        if(event){
-                          endDateControl?.setValue(new Date(selectedOption?.endDate));
-                          endDateControl?.updateValueAndValidity();
-                        }
+                {
+                    controlType: 'calendar-picker',
+                    colSize: 'col-12 md:col-6',
+                    options: {
+                        label: 'Date Of Birth',
+                        formControlName: 'dateOfBirth',
+                        placeholder:'mm/dd/yyyy',
+                        // disabled: true,
+                        containerClass: 'align-items-center pl-4 sm:pl-6',
+                        controlLayout: 'horizontal',
+                        labelColSize: 'col-4',
+                        controlColSize: 'col-8',
                     },
                 },
-            },
-            {
-                id: "endDateField",
-                controlType: 'calendar-picker',
-                colSize: 'col-12 md:col-6',
-                options: {
-                    label: 'End Date',
-                    formControlName: 'endDate',
-                    placeholder:'mm/dd/yyyy',
-                    disabled: true,
-                    containerClass: 'align-items-center pl-4 sm:pl-6',
-                    controlLayout: 'horizontal',
-                    labelColSize: 'col-4',
-                    controlColSize: 'col-8',
+                {
+                  controlType: 'lookup-select',
+                  colSize: 'col-12 md:col-6',
+                  options: {
+                      label: 'Countries',
+                      formControlName: 'countryId',
+                      validators: {
+                          required: true,
+                      },
+                      placeholder: 'Select Country',
+                      filter: true,
+                      module: ModulesNames.sanedSharedData,
+                      entity: EntitiesNames.countries,
+                      version: 'v1.2',
+                      apiBaseUrl: getBaseUrl(),
+                      query: {},
+                      containerClass: "align-items-center pl-4 sm:pl-6",
+                      controlLayout: "horizontal",
+                      labelColSize: "col-4",
+                      controlColSize: "col-8",
+                      ngModelChange: (event, formGroup) => {
+                          console.log(event);
+                          const cityIndex =
+                              this.helperService.getFormFieldIndexByControlName(
+                                  this.formFields,
+                                  'cityId'
+                              );
+                          const cityControl = formGroup?.get('cityId');
+                          if (
+                              cityIndex !== -1 &&
+                              this.formFields[cityIndex] &&
+                              this.formFields[cityIndex].options
+                          ) {
+                              const cityField: any = this.formFields[cityIndex];
+      
+                              cityField.options['isVisible'] = false;
+                              cityField.options['query'] = {
+                                  filters: {
+                                      countryId: { value: event },
+                                  },
+                              };
+                              setTimeout(() => {
+                                  cityField.options['isVisible'] = true;
+                              }, 100);
+                              cityControl?.setValue(null);
+                              cityControl?.updateValueAndValidity();
+                          }
+                      },
+                  },
+              },
+              {
+                  controlType: 'lookup-select',
+                  colSize: 'col-12 md:col-6',
+                  options: {
+                      label: 'Cities',
+                      formControlName: 'cityId',
+                      validators: {
+                          required: true,
+                      },
+                      ngModelChange: (e) => {
+                          console.log(e);
+                      },
+                      placeholder: 'Select City',
+                      filter: true,
+                      module: ModulesNames.sanedSharedData,
+                      entity: EntitiesNames.cities,
+                      version: 'v1.2',
+                      apiBaseUrl: getBaseUrl(),
+                      query: {
+                          filters: {
+                              countryId: { value: null },
+                          },
+                      },
+                      containerClass: "align-items-center pl-4 sm:pl-6",
+                      controlLayout: "horizontal",
+                      labelColSize: "col-4",
+                      controlColSize: "col-8"
+                  },
+              },
+      
+                {
+                  controlType: 'lookup-select',
+                  colSize: 'col-12 md:col-6',
+                  options: {
+                      label: 'Zone Name',
+                      formControlName: 'regionId',
+                      validators: {
+                          required: true,
+                      },
+                      placeholder: 'Select zoneId',
+                      module: ModulesNames.logisticSystem,
+                      entity: EntitiesNames.zones,
+                      version: 'v1',
+                      apiBaseUrl: getBaseUrl(),
+                      containerClass: "align-items-center pl-4 sm:pl-6",
+                      controlLayout: "horizontal",
+                      labelColSize: "col-4",
+                      controlColSize: "col-8"
+                  },
+              },
+                {
+                    controlType: 'input-number',
+                    colSize: 'col-12 md:col-6',
+                    options: {
+                        label: 'Student Number',
+                        formControlName: 'studentNumber',
+                        // readonly: true,
+                        containerClass: 'align-items-center pl-4 sm:pl-6',
+                        controlLayout: 'horizontal',
+                        labelColSize: 'col-4',
+                        controlColSize: 'col-8',
+                    },
                 },
-            },
-            {
-                controlType: 'input-number',
-                colSize: 'col-12 md:col-6',
-                options: {
-                    label: 'Periods Total',
-                    formControlName: 'periodTotal',
-                    readonly: true,
-                    containerClass: 'align-items-center pl-4 sm:pl-6',
-                    controlLayout: 'horizontal',
-                    labelColSize: 'col-4',
-                    controlColSize: 'col-8',
+                {
+                    controlType: 'input',
+                    colSize: 'col-12 md:col-6',
+                    options: {
+                        label: 'Address',
+                        formControlName: 'address',
+                        placeholder: 'Enter Address',
+                        containerClass: 'align-items-center pl-4 sm:pl-6',
+                        controlLayout: 'horizontal',
+                        labelColSize: 'col-4',
+                        controlColSize: 'col-8',
+                        validators: {
+                            required: true,
+                        },
+                    },
+                },
+                {
+                    controlType: "input-number",
+                    colSize: "col-12 md:col-6",
+                    options: {
+                      label: "Phone Number",
+                      formControlName: "phoneNumber",
+                      validators: {
+                        required: true
+                      },
+                      apiBaseUrl: getBaseUrl(),
+                      containerClass: 'align-items-center pl-4 sm:pl-6',
+                      controlLayout: "horizontal",
+                        labelColSize: "col-4",
+                        controlColSize: "col-8",
+                    },
+                  },
+                {
+                    controlType: 'input',
+                    colSize: 'col-12 md:col-6',
+                    options: {
+                        label: 'Email',
+                        formControlName: 'email',
+                        placeholder: 'Enter Email',
+                        containerClass: 'align-items-center pl-4 sm:pl-6',
+                        controlLayout: 'horizontal',
+                        labelColSize: 'col-4',
+                        controlColSize: 'col-8',
+                        validators: {
+                            required: true,
+                        },
+                    },
+                },
+                {
+                    controlType: 'input',
+                    colSize: 'col-12 md:col-6',
+                    options: {
+                        label: 'Grade Level',
+                        formControlName: 'gradeLevel',
+                        placeholder: 'Enter Grade Level',
+                        containerClass: 'align-items-center pl-4 sm:pl-6',
+                        controlLayout: 'horizontal',
+                        labelColSize: 'col-4',
+                        controlColSize: 'col-8',
+                        validators: {
+                            required: true,
+                        },
+                    },
+                },
+                {
+                    controlType: 'input',
+                    colSize: 'col-12 md:col-6',
+                    options: {
+                        label: 'Parent Name',
+                        formControlName: 'parentName',
+                        placeholder: 'Enter Parent Name',
+                        containerClass: 'align-items-center pl-4 sm:pl-6',
+                        controlLayout: 'horizontal',
+                        labelColSize: 'col-4',
+                        controlColSize: 'col-8',
+                        validators: {
+                            required: true,
+                        },
+                    },
+                },
+                {
+                    controlType: "input-number",
+                    colSize: "col-12 md:col-6",
+                    options: {
+                      label: "Parent Phone Number",
+                      formControlName: "parentPhoneNumber",
+                      validators: {
+                        required: true
+                      },
+                      apiBaseUrl: getBaseUrl(),
+                      containerClass: 'align-items-center pl-4 sm:pl-6',
+                      controlLayout: "horizontal",
+                      labelColSize: "col-4",
+                      controlColSize: "col-8",
+                    },
+                  },
+                {
+                    controlType: "calendar-picker",
+                    colSize: "col-12 md:col-6",
+                    options: {
+                    label: "Registration Date",
+                    id: 91,
+                    formControlName: "registrationDate",
+                    calendarType: "dateTime",
+                        placeholder: "Enter Registration Date",
+                        containerClass: "align-items-center pl-4 sm:pl-6",
+                        controlLayout: "horizontal",
+                        labelColSize: "col-4",
+                        controlColSize: "col-8",
+                    validators: {
+                        required: true,
+                    },
+                    ngModelChange: (e) => {
+                        console.log(e);
+                    },
+                    },
                 },
            
            
-            },
         ];
         this.form = this.formFactory.createForm(this.formFields);
     }
