@@ -13,9 +13,7 @@ import {
   PageHeading,
 } from 'src/app/common/page-heading/page-heading.component';
 import { ErrorHandlerService } from 'src/app/core/service/error-handler.service';
-import { HelperService } from 'src/app/core/service/helper.service';
 import { StudentService } from 'src/app/core/service/student.service';
-import { TemplateService } from 'src/app/core/service/template.service';
 import { SharedModule } from 'src/app/shared/shared.module';
 
 @Component({
@@ -109,7 +107,7 @@ export class StudentCreateComponent {
           summary: 'Success',
           detail: 'Student created successfully',
         });
-        this.router.navigate(['/student/student-list']);
+        this.router.navigate(['student','add']);
       },
       error: (error) => {
         this.errorHandlerService.handleError(error, this.messageService);
@@ -128,7 +126,7 @@ export class StudentCreateComponent {
             summary: 'Success',
             detail: 'Student updated successfully',
           });
-          this.router.navigate(['/student/student-list']);
+          this.router.navigate(['student' , 'student','edit']);
         },
         error: (error) => {
           this.errorHandlerService.handleError(error, this.messageService);
@@ -189,7 +187,7 @@ export class StudentCreateComponent {
       breadcrumbs: [
         {
           label: 'Student',
-          routerLink: '/student/student-list',
+          routerLink: '/student',
         },
         {
           label:

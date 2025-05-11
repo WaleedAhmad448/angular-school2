@@ -122,7 +122,7 @@ export class StudentListComponent implements OnInit {
         {
           icon: 'pi pi-pencil',
           onClick: (student: Student) => {
-            this.router.navigate(['student', 'edit'], { state: student });
+              this.router.navigate([ 'student','edit', student.id]);
           },
           colorClass: 'p-button-info',
         }
