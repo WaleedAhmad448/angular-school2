@@ -7,14 +7,22 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class ApiServices<T> {
-  private baseUrl = environment.apiBaseUrl
+  private baseUrl = environment.apiBaseUrl;
 
   constructor(private http: HttpClient) {}
 
-  // GET: Get all items
-  getAll(endpoint: string, params?: HttpParams): Observable<T[]> {
-    return this.http.get<T[]>(`${this.baseUrl}${endpoint}`, { params });
-  }
+  // // GET: Get all items
+  // getAll(endpoint: string, params?: HttpParams): Observable<T[]> {
+  //   return this.http.get<T[]>(`${this.baseUrl}${endpoint}`, { params });
+  // }
+private formatEndpoint(endpoint: string): string {
+  return endpoint.replace(/^\/+|\/+$/g, ''); // يزيل أي سلاش في البداية أو النهاية
+}
+
+// مثال في getAll:
+getAll(endpoint: string, params?: HttpParams): Observable<T[]> {
+  return this.http.get<T[]>(`${this.baseUrl}${this.formatEndpoint(endpoint)}`, { params });
+}
 
   // GET: Get single item by ID
   getById(endpoint: string, id: number | string): Observable<T> {

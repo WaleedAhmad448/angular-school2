@@ -93,26 +93,17 @@ export class ApiService<T = any> {
   /**
    * Get all data
    */
-  getAll(query: ApiQueryDto): Observable<ApiListDto<T>> {
-    return this._httpClient
-      .post<ApiResponseDto<ApiListDto<T>>>(`${this.baseUrl}/all`, query)
-      .pipe(
-        map((response) => this.checkResponseStatus(response) ?? { items: [], total: 0, pageInfo: { currentPage: 1, totalPages: 1, pageSize: 10, totalItems: 0, pageIndex: 0 } })
-      )
-      .pipe(
-        catchError((response: any) => throwError(() => response.error))
-      );
-  }
-// getAll(query: ApiQueryDto): Observable<any[]> {
-//   return this._httpClient
-//     .post<ApiResponseDto<ApiListDto<any>>>(`${this.baseUrl}/all`, query)
-//     .pipe(
-//       map((response) => this.checkResponseStatus(response)?.items ?? []) // ✅ تحويل ApiListDto إلى any[]
-//     )
-//     .pipe(
-//       catchError((response: any) => throwError(() => response.error))
-//     );
-// }
+  
+getAll(query: ApiQueryDto): Observable<any[]> {
+  return this._httpClient
+    .post<ApiResponseDto<ApiListDto<any>>>(`${this.baseUrl}/all`, query)
+    .pipe(
+      map((response) => this.checkResponseStatus(response)?.items ?? []) // ✅ تحويل ApiListDto إلى any[]
+    )
+    .pipe(
+      catchError((response: any) => throwError(() => response.error))
+    );
+}
   /**
    * Get paged data
    */

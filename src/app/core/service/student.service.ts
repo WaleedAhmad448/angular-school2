@@ -13,9 +13,7 @@ export class StudentService {
 
   private endpoint = 'StudentRegistration'; // تأكد أنه يطابق مسار الـ API في الباكند
   constructor(private api: ApiServices<Student>, private http: HttpClient) {}
-  private apiUrl = environment.baseUrl;
-  // this.http.get(`${environment.apiUrl}/OAuth/userinfo`)
-
+  private basUrl = environment.apiBaseUrl;
   getAllStudents(): Observable<Student[]> {
     return this.api.getAll(this.endpoint);
   }
@@ -26,12 +24,6 @@ export class StudentService {
 
   registerStudent(data: StudentRegistrationDto): Observable<Student> {
     return this.api.create(this.endpoint, data as unknown as Student);
-  }
-  createStudent(payload: any) {
-    // return this.api.create('/api/StudentRegistration', payload);
-    // return this.http.get(`${this.apiUrl}/OAuth/userinfo`);
-    return this.http.post(`${this.apiUrl}/StudentRegistration`, payload);
-
   }
   
   updateStudent(id: number, data: StudentRegistrationDto): Observable<Student> {

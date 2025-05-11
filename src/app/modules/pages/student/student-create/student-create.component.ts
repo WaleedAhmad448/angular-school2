@@ -42,8 +42,6 @@ export class StudentCreateComponent {
     form!: FormGroup;
     formFields: KitsngFormFactoryModel[] = [];
     headerOptions!: PageHeadeingOptions;
-    // const templateService = inject(TemplateService);
-    // const helperService = inject(HelperService);
     constructor(public formFactory: KitsngFormFactoryService,private studentService : StudentService,
         private errorHandlerService: ErrorHandlerService, private messageService: MessageService,
       private templateService: TemplateService,
@@ -55,28 +53,6 @@ export class StudentCreateComponent {
        
     }
     checkPageUrl() {
-        // if (this.pageUrl === 'edit') {
-        //     const studentData = history.state as any;
-        //     if (studentData && Object.keys(studentData).length > 0) {
-        //       this.mapFromApi(studentData);
-        //     } else {
-        //       this.router.navigate(['/student/student-list']); // رجوع لو ما في بيانات
-        //     }
-        //   }
-        // this.activeRoute.params.subscribe((params) => {
-        //     const studentId = params['id'];
-        //     if (studentId) {
-        //         this.studentService.getStudentById(studentId).subscribe({
-        //             next: (response) => {
-        //                 this.mapFromApi(response);
-        //             },
-        //             error: (error) => {
-        //                 this.errorHandlerService.handleError(error, this.messageService);
-        //             }
-        //         });
-        //     } 
-        // });
-        // Subscribe to the URL changes
         this.activeRoute.url.subscribe({
           next: (value) => {
             const urlPath = value.map((url) => url.path)[0];
@@ -148,20 +124,18 @@ export class StudentCreateComponent {
     //       }
     //     });
     //   }
-    create() {
+     create() {
         const formData = this.form.value;
       
         const payload = {
-          registrationDto: {
-            ...formData,
-            dateOfBirth: new Date(formData.dateOfBirth).toISOString(),
-            registrationDate: new Date(formData.registrationDate).toISOString()
-          }
+          ...formData,
+          dateOfBirth: new Date(formData.dateOfBirth).toISOString(),
+          registrationDate: new Date(formData.registrationDate).toISOString()
         };
       
         this.form.disable(); // منع التعديل أثناء الإرسال
       
-        this.studentService.createStudent(payload).subscribe({
+        this.studentService.registerStudent(payload).subscribe({
           next: (res) => {
             this.messageService.add({
               severity: 'success',
@@ -219,23 +193,7 @@ export class StudentCreateComponent {
           registrationDate: data.registrationDate
         });
       }
-        // ngOnInit() {
-        //     this.initForm();
-        //     this.initHeaderOptions();
-        //     if (this.pageUrl == 'edit') {
-        //     this.activeRoute.params.subscribe((params) => {
-        //         const studentId = params['id'];
-        //         this.studentService.getStudentById(studentId).subscribe({
-        //         next: (response) => {
-        //             this.mapFromApi(response);
-        //         },
-        //         error: (error) => {
-        //             this.errorHandlerService.handleError(error, this.messageService);
-        //         }
-        //         });
-        //     });
-        //     }
-        // }      
+         
     scrollToFirstError() {
         const invalidElements =
           this.formContainerRef?.nativeElement?.querySelectorAll(":not(form).ng-invalid");
