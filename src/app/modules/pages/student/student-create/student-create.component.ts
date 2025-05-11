@@ -12,9 +12,6 @@ import {
     PageHeadeingOptions,
     PageHeading,
 } from 'src/app/common/page-heading/page-heading.component';
-import { EntitiesNames, ModulesNames } from 'src/app/core/model/enums.model';
-import { getBaseUrl } from 'src/app/core/model/http-response.model';
-
 import { ErrorHandlerService } from 'src/app/core/service/error-handler.service';
 import { HelperService } from 'src/app/core/service/helper.service';
 import { StudentService } from 'src/app/core/service/student.service';
@@ -44,8 +41,6 @@ export class StudentCreateComponent {
     headerOptions!: PageHeadeingOptions;
     constructor(public formFactory: KitsngFormFactoryService,private studentService : StudentService,
         private errorHandlerService: ErrorHandlerService, private messageService: MessageService,
-      private templateService: TemplateService,
-      private helperService: HelperService
     ) {
         this.checkPageUrl();
         this.initHeaderOptions();
@@ -112,45 +107,18 @@ export class StudentCreateComponent {
         }
        }
     }
-    // create() {
-    //     const request = this.addMapToApi(this.form.value);
-    //     this.studentService.registerStudent(request).subscribe({
-    //       next: () => {
-    //         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Student created successfully' });
-    //         this.router.navigate(['/student/student-list']);
-    //       },
-    //       error: (error) => {
-    //         this.errorHandlerService.handleError(error, this.messageService);
-    //       }
-    //     });
-    //   }
-     create() {
-        const formData = this.form.value;
-      
-        const payload = {
-          ...formData,
-          dateOfBirth: new Date(formData.dateOfBirth).toISOString(),
-          registrationDate: new Date(formData.registrationDate).toISOString()
-        };
-      
-        this.form.disable(); // منع التعديل أثناء الإرسال
-      
-        this.studentService.registerStudent(payload).subscribe({
-          next: (res) => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Student Created',
-              detail: 'Student has been registered successfully.'
-            });
+    create() {
+        const request = this.addMapToApi(this.form.value);
+        this.studentService.registerStudent(request).subscribe({
+          next: () => {
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Student created successfully' });
             this.router.navigate(['/student/student-list']);
           },
-          error: (err) => {
-            this.form.enable(); // إعادة تفعيل النموذج إذا حصل خطأ
-            this.errorHandlerService.handleError(err, this.messageService);
+          error: (error) => {
+            this.errorHandlerService.handleError(error, this.messageService);
           }
         });
       }
-      
       
     update() {
         const request = this.editMapToApi(this.form.value);
@@ -190,7 +158,6 @@ export class StudentCreateComponent {
           gradeLevel: data.gradeLevel,
           parentName: data.parentName,
           parentPhoneNumber: data.parentPhoneNumber,
-          registrationDate: data.registrationDate
         });
       }
          
@@ -226,267 +193,85 @@ export class StudentCreateComponent {
     initForm() {
         this.formFields = [
                 {
-                    controlType: 'input',
-                    colSize: 'col-12 md:col-6',
-                    options: {
-                        label: 'Full Name',
-                        formControlName: 'fullName',
-                        placeholder: 'Enter Full Name',
-                        containerClass: 'align-items-center pl-4 sm:pl-6',
-                        controlLayout: 'horizontal',
-                        labelColSize: 'col-4',
-                        controlColSize: 'col-8',
-                        validators: {
-                            required: true,
-                        },
-                    },
-                },
-                {
-                    controlType: 'calendar-picker',
-                    colSize: 'col-12 md:col-6',
-                    options: {
-                        label: 'Date Of Birth',
-                        formControlName: 'dateOfBirth',
-                        placeholder:'mm/dd/yyyy',
-                        // disabled: true,
-                        containerClass: 'align-items-center pl-4 sm:pl-6',
-                        controlLayout: 'horizontal',
-                        labelColSize: 'col-4',
-                        controlColSize: 'col-8',
-                    },
-                },
-                {
-                  controlType: 'lookup-select',
+                  controlType: 'input',
                   colSize: 'col-12 md:col-6',
                   options: {
-                      label: 'Countries',
-                      formControlName: 'countryId',
-                      validators: {
-                          required: true,
-                      },
-                      placeholder: 'Select Country',
-                      filter: true,
-                      // module: ModulesNames.sanedSharedData,
-                      // entity: EntitiesNames.countries,
-                      version: 'v1.2',
-                      apiBaseUrl: getBaseUrl(),
-                      query: {},
-                      containerClass: "align-items-center pl-4 sm:pl-6",
-                      controlLayout: "horizontal",
-                      labelColSize: "col-4",
-                      controlColSize: "col-8",
-                      ngModelChange: (event, formGroup) => {
-                          console.log(event);
-                          const cityIndex =
-                              this.helperService.getFormFieldIndexByControlName(
-                                  this.formFields,
-                                  'cityId'
-                              );
-                          const cityControl = formGroup?.get('cityId');
-                          if (
-                              cityIndex !== -1 &&
-                              this.formFields[cityIndex] &&
-                              this.formFields[cityIndex].options
-                          ) {
-                              const cityField: any = this.formFields[cityIndex];
-      
-                              cityField.options['isVisible'] = false;
-                              cityField.options['query'] = {
-                                  filters: {
-                                      countryId: { value: event },
-                                  },
-                              };
-                              setTimeout(() => {
-                                  cityField.options['isVisible'] = true;
-                              }, 100);
-                              cityControl?.setValue(null);
-                              cityControl?.updateValueAndValidity();
-                          }
-                      },
+                    label: 'Full Name',
+                    formControlName: 'fullName',
+                    validators: { required: true },
                   },
-              },
-              {
-                  controlType: 'lookup-select',
+                },
+                {
+                  controlType: 'calendar-picker',
                   colSize: 'col-12 md:col-6',
                   options: {
-                      label: 'Cities',
-                      formControlName: 'cityId',
-                      validators: {
-                          required: true,
-                      },
-                      ngModelChange: (e) => {
-                          console.log(e);
-                      },
-                      placeholder: 'Select City',
-                      filter: true,
-                      // module: ModulesNames.sanedSharedData,
-                      // entity: EntitiesNames.cities,
-                      version: 'v1.2',
-                      apiBaseUrl: getBaseUrl(),
-                      query: {
-                          filters: {
-                              countryId: { value: null },
-                          },
-                      },
-                      containerClass: "align-items-center pl-4 sm:pl-6",
-                      controlLayout: "horizontal",
-                      labelColSize: "col-4",
-                      controlColSize: "col-8"
+                    label: 'Date of Birth',
+                    formControlName: 'dateOfBirth',
+                    validators: { required: true },
                   },
-              },
-      
+                },
                 {
-                  controlType: 'lookup-select',
+                  controlType: 'input',
                   colSize: 'col-12 md:col-6',
                   options: {
-                      label: 'Zone Name',
-                      formControlName: 'regionId',
-                      validators: {
-                          required: true,
-                      },
-                      placeholder: 'Select zoneId',
-                      // module: ModulesNames.logisticSystem,
-                      // entity: EntitiesNames.zones,
-                      version: 'v1',
-                      apiBaseUrl: getBaseUrl(),
-                      containerClass: "align-items-center pl-4 sm:pl-6",
-                      controlLayout: "horizontal",
-                      labelColSize: "col-4",
-                      controlColSize: "col-8"
+                    label: 'Phone Number',
+                    formControlName: 'phoneNumber',
+                    validators: { required: true },
                   },
-              },
-                {
-                    controlType: 'input-number',
-                    colSize: 'col-12 md:col-6',
-                    options: {
-                        label: 'Student Number',
-                        formControlName: 'studentNumber',
-                        // readonly: true,
-                        containerClass: 'align-items-center pl-4 sm:pl-6',
-                        controlLayout: 'horizontal',
-                        labelColSize: 'col-4',
-                        controlColSize: 'col-8',
-                    },
                 },
                 {
-                    controlType: 'input',
-                    colSize: 'col-12 md:col-6',
-                    options: {
-                        label: 'Address',
-                        formControlName: 'address',
-                        placeholder: 'Enter Address',
-                        containerClass: 'align-items-center pl-4 sm:pl-6',
-                        controlLayout: 'horizontal',
-                        labelColSize: 'col-4',
-                        controlColSize: 'col-8',
-                        validators: {
-                            required: true,
-                        },
-                    },
-                },
-                {
-                    controlType: "input-number",
-                    colSize: "col-12 md:col-6",
-                    options: {
-                      label: "Phone Number",
-                      formControlName: "phoneNumber",
-                      validators: {
-                        required: true
-                      },
-                      apiBaseUrl: getBaseUrl(),
-                      containerClass: 'align-items-center pl-4 sm:pl-6',
-                      controlLayout: "horizontal",
-                        labelColSize: "col-4",
-                        controlColSize: "col-8",
-                    },
+                  controlType: 'input',
+                  colSize: 'col-12 md:col-6',
+                  options: {
+                    label: 'Email',
+                    formControlName: 'email',
+                    validators: { required: true },
                   },
-                {
-                    controlType: 'input',
-                    colSize: 'col-12 md:col-6',
-                    options: {
-                        label: 'Email',
-                        formControlName: 'email',
-                        placeholder: 'Enter Email',
-                        containerClass: 'align-items-center pl-4 sm:pl-6',
-                        controlLayout: 'horizontal',
-                        labelColSize: 'col-4',
-                        controlColSize: 'col-8',
-                        validators: {
-                            required: true,
-                        },
-                    },
                 },
                 {
-                    controlType: 'input',
-                    colSize: 'col-12 md:col-6',
-                    options: {
-                        label: 'Grade Level',
-                        formControlName: 'gradeLevel',
-                        placeholder: 'Enter Grade Level',
-                        containerClass: 'align-items-center pl-4 sm:pl-6',
-                        controlLayout: 'horizontal',
-                        labelColSize: 'col-4',
-                        controlColSize: 'col-8',
-                        validators: {
-                            required: true,
-                        },
-                    },
-                },
-                {
-                    controlType: 'input',
-                    colSize: 'col-12 md:col-6',
-                    options: {
-                        label: 'Parent Name',
-                        formControlName: 'parentName',
-                        placeholder: 'Enter Parent Name',
-                        containerClass: 'align-items-center pl-4 sm:pl-6',
-                        controlLayout: 'horizontal',
-                        labelColSize: 'col-4',
-                        controlColSize: 'col-8',
-                        validators: {
-                            required: true,
-                        },
-                    },
-                },
-                {
-                    controlType: "input-number",
-                    colSize: "col-12 md:col-6",
-                    options: {
-                      label: "Parent Phone Number",
-                      formControlName: "parentPhoneNumber",
-                      validators: {
-                        required: true
-                      },
-                      apiBaseUrl: getBaseUrl(),
-                      containerClass: 'align-items-center pl-4 sm:pl-6',
-                      controlLayout: "horizontal",
-                      labelColSize: "col-4",
-                      controlColSize: "col-8",
-                    },
+                  controlType: 'input',
+                  colSize: 'col-12 md:col-6',
+                  options: {
+                    label: 'Address',
+                    formControlName: 'address',
+                    id: 5,
+                    validators: { required: true },
+                    
                   },
-                {
-                    controlType: "calendar-picker",
-                    colSize: "col-12 md:col-6",
-                    options: {
-                    label: "Registration Date",
-                    id: 91,
-                    formControlName: "registrationDate",
-                    calendarType: "dateTime",
-                        placeholder: "Enter Registration Date",
-                        containerClass: "align-items-center pl-4 sm:pl-6",
-                        controlLayout: "horizontal",
-                        labelColSize: "col-4",
-                        controlColSize: "col-8",
-                    validators: {
-                        required: true,
-                    },
-                    ngModelChange: (e) => {
-                        console.log(e);
-                    },
-                    },
                 },
-           
-           
+                {
+                  controlType: 'input',
+                  colSize: 'col-12 md:col-6',
+                  options: {
+                    label: 'Grade Level',
+                    formControlName: 'gradeLevel',
+                    validators: { required: true },
+                  },
+                },
+                {
+                  controlType: 'input',
+                  colSize: 'col-12 md:col-6',
+                  options: {
+                    label: 'Student Number',
+                    formControlName: 'studentNumber',
+                  },
+                },
+                {
+                  controlType: 'input',
+                  colSize: 'col-12 md:col-6',
+                  options: {
+                    label: 'Parent Name',
+                    formControlName: 'parentName',
+                  },
+                },
+                {
+                  controlType: 'input',
+                  colSize: 'col-12 md:col-6',
+                  options: {
+                    label: 'Parent Phone Number',
+                    formControlName: 'parentPhoneNumber',
+                  },
+                },
         ];
         this.form = this.formFactory.createForm(this.formFields);
     }

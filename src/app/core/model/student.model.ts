@@ -1,7 +1,7 @@
 export interface Student {
   id: number;
   fullName: string;
-  dateOfBirth: Date;
+  dateOfBirth: string;
   studentNumber: string;
   address: string;
   phoneNumber: string;
@@ -9,12 +9,12 @@ export interface Student {
   gradeLevel: number;
   parentName?: string;
   parentPhoneNumber?: string;
-  registrationDate: Date;
+  registrationDate: string;
 }
 
 export interface StudentRegistrationDto {
   fullName: string;
-  dateOfBirth: Date;
+  dateOfBirth: string;
   address: string;
   phoneNumber: string;
   email: string;
