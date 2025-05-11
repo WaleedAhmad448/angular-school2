@@ -14,7 +14,7 @@ const routes: Routes = [
         
     },
     {
-        path: 'edit',
+        path: 'edit/:id',
         loadComponent: () => import('./student-create/student-create.component').then(m => m.StudentCreateComponent),
         
     },
