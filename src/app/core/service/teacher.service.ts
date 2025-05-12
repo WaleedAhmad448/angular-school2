@@ -59,10 +59,10 @@ export class TeacherService {
     return this.api.postFormData(`${this.endpoint}/${id}/upload-image`, formData);
   }
 
-uploadTeacherImage(fileData: FormData): Observable<{ imagePath: string }> {
-  const url = `${this.api.getBaseUrl()}/Teacher/upload-profile-image`;
-  return this.http.post<{ imagePath: string }>(url, fileData);
-}
+  uploadTeacherImage(fileData: FormData): Observable<{ imagePath: string }> {
+    const url = `${this.api.getBaseUrl()}/Teacher/upload-profile-image`;
+    return this.http.post<{ imagePath: string }>(url, fileData);
+  }
 
 
   // حذف صورة (اختياري)

@@ -96,65 +96,61 @@ export class TeacherCreateComponent {
       }
     }
   }
-create() {
-  const formData = new FormData();
-  const rawData = this.form.value;
+// create() {
+//   const formData = new FormData();
+//   const rawData = this.form.value;
+//   const imageFile = rawData.profileImagePath; // هذا هو كائن الصورة
+//   if (imageFile && imageFile instanceof File) {
+//     formData.append('file', imageFile);
+//     // 1. رفع الصورة أولاً
+//     this.teacherService.uploadTeacherImage(formData).subscribe({
+//       next: (uploadRes) => {
+//         // 2. استخدم مسار الصورة بعد رفعها
+//         const request = this.addMapToApi({
+//           ...rawData,
+//           profileImagePath: uploadRes.imagePath // مثلا: "uploads/teachers/img123.jpg"
+//         });
 
-  const imageFile = rawData.profileImagePath; // هذا هو كائن الصورة
+//         // 3. إرسال الطلب لإنشاء المدرّس
+//         this.teacherService.registerTeacher(request).subscribe({
+//           next: () => {
+//             this.messageService.add({
+//               severity: 'success',
+//               summary: 'Success',
+//               detail: 'Teacher created successfully',
+//             });
+//             this.router.navigate(['teacher']);
+//           },
+//           error: (error) => {
+//             this.errorHandlerService.handleError(error, this.messageService);
+//           }
+//         });
+//       },
+//       error: (uploadError) => {
+//         this.errorHandlerService.handleError(uploadError, this.messageService);
+//       }
+//     });
+//   } else {
+//     this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Profile image is required.' });
+//   }
+// }
 
-  if (imageFile && imageFile instanceof File) {
-    formData.append('file', imageFile);
-    
-    // 1. رفع الصورة أولاً
-    this.teacherService.uploadTeacherImage(formData).subscribe({
-      next: (uploadRes) => {
-        // 2. استخدم مسار الصورة بعد رفعها
-        const request = this.addMapToApi({
-          ...rawData,
-          profileImagePath: uploadRes.imagePath // مثلا: "uploads/teachers/img123.jpg"
+  create() {
+    const request = this.addMapToApi(this.form.value);
+    this.teacherService.registerTeacher(request).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Teacher created successfully',
         });
-
-        // 3. إرسال الطلب لإنشاء المدرّس
-        this.teacherService.registerTeacher(request).subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Success',
-              detail: 'Teacher created successfully',
-            });
-            this.router.navigate(['teacher']);
-          },
-          error: (error) => {
-            this.errorHandlerService.handleError(error, this.messageService);
-          }
-        });
+        this.router.navigate(['teacher']);
       },
-      error: (uploadError) => {
-        this.errorHandlerService.handleError(uploadError, this.messageService);
-      }
+      error: (error) => {
+        this.errorHandlerService.handleError(error, this.messageService);
+      },
     });
-
-  } else {
-    this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Profile image is required.' });
   }
-}
-
-  // create() {
-  //   const request = this.addMapToApi(this.form.value);
-  //   this.teacherService.registerTeacher(request).subscribe({
-  //     next: () => {
-  //       this.messageService.add({
-  //         severity: 'success',
-  //         summary: 'Success',
-  //         detail: 'Teacher created successfully',
-  //       });
-  //       this.router.navigate(['teacher']);
-  //     },
-  //     error: (error) => {
-  //       this.errorHandlerService.handleError(error, this.messageService);
-  //     },
-  //   });
-  // }
 
   update() {
     const request = this.editMapToApi(this.form.value);
