@@ -14,6 +14,8 @@ export class StudentService {
   private endpoint = 'StudentRegistration'; // تأكد أنه يطابق مسار الـ API في الباكند
   constructor(private api: ApiServices<Student>, private http: HttpClient) {}
   private basUrl = environment.apiBaseUrl;
+
+  
   getAllStudents(): Observable<Student[]> {
     return this.api.getAll(this.endpoint);
   }

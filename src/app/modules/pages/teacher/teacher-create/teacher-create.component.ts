@@ -13,18 +13,18 @@ import {
   PageHeading,
 } from 'src/app/common/page-heading/page-heading.component';
 import { ErrorHandlerService } from 'src/app/core/service/error-handler.service';
-import { StudentService } from 'src/app/core/service/student.service';
+import { TeacherService } from 'src/app/core/service/teacher.service';
 import { SharedModule } from 'src/app/shared/shared.module';
 
 @Component({
-  selector: 'app-student-create',
+  selector: 'app-teacher-create',
   standalone: true,
   imports: [CommonModule, SharedModule, PageHeading, KitsngFormFactoryModule],
   providers: [MessageService],
-  templateUrl: './student-create.component.html',
-  styleUrl: './student-create.component.scss',
+  templateUrl: './teacher-create.component.html',
+  styleUrl: './teacher-create.component.scss',
 })
-export class StudentCreateComponent {
+export class TeacherCreateComponent {
   @ViewChild('formContainerRef', { static: false })
   formContainerRef!: ElementRef;
 
@@ -33,14 +33,14 @@ export class StudentCreateComponent {
 
   pageUrl: 'edit' | 'add' | null = null;
   _arrayFormLength: number = 0;
-  studentId!: number;
+  teacherId!: number;
 
   form!: FormGroup;
   formFields: KitsngFormFactoryModel[] = [];
   headerOptions!: PageHeadeingOptions;
   constructor(
     public formFactory: KitsngFormFactoryService,
-    private studentService: StudentService,
+    private teacherService: TeacherService,
     private errorHandlerService: ErrorHandlerService,
     private messageService: MessageService
   ) {
@@ -56,8 +56,8 @@ export class StudentCreateComponent {
           case 'edit':
             this.pageUrl = 'edit';
             this.activeRoute.params.subscribe((params) => {
-              this.studentId = +params['id'];
-              this.fetchStudentData(); // 🟢 Load data for editing
+              this.teacherId = +params['id'];
+              this.fetchTeacherData(); // 🟢 Load data for editing
             });
             break;
           case 'add':
@@ -71,11 +71,11 @@ export class StudentCreateComponent {
     });
   }
 
-  fetchStudentData() {
-    this.studentService.getStudentById(this.studentId).subscribe({
-      next: (student) => {
+  fetchTeacherData() {
+    this.teacherService.getTeacherById(this.teacherId).subscribe({
+      next: (teacher) => {
         this.initForm();
-        this.mapFromApi(student);
+        this.mapFromApi(teacher);
       },
       error: (err) => {
         this.errorHandlerService.handleError(err, this.messageService);
@@ -96,36 +96,78 @@ export class StudentCreateComponent {
       }
     }
   }
+create() {
+  const formData = new FormData();
+  const rawData = this.form.value;
 
-  create() {
-    const request = this.addMapToApi(this.form.value);
-    this.studentService.registerStudent(request).subscribe({
-      next: () => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Student created successfully',
+  const imageFile = rawData.profileImagePath; // هذا هو كائن الصورة
+
+  if (imageFile && imageFile instanceof File) {
+    formData.append('file', imageFile);
+    
+    // 1. رفع الصورة أولاً
+    this.teacherService.uploadTeacherImage(formData).subscribe({
+      next: (uploadRes) => {
+        // 2. استخدم مسار الصورة بعد رفعها
+        const request = this.addMapToApi({
+          ...rawData,
+          profileImagePath: uploadRes.imagePath // مثلا: "uploads/teachers/img123.jpg"
         });
-        this.router.navigate(['student']);
+
+        // 3. إرسال الطلب لإنشاء المدرّس
+        this.teacherService.registerTeacher(request).subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'Teacher created successfully',
+            });
+            this.router.navigate(['teacher']);
+          },
+          error: (error) => {
+            this.errorHandlerService.handleError(error, this.messageService);
+          }
+        });
       },
-      error: (error) => {
-        this.errorHandlerService.handleError(error, this.messageService);
-      },
+      error: (uploadError) => {
+        this.errorHandlerService.handleError(uploadError, this.messageService);
+      }
     });
+
+  } else {
+    this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Profile image is required.' });
   }
+}
+
+  // create() {
+  //   const request = this.addMapToApi(this.form.value);
+  //   this.teacherService.registerTeacher(request).subscribe({
+  //     next: () => {
+  //       this.messageService.add({
+  //         severity: 'success',
+  //         summary: 'Success',
+  //         detail: 'Teacher created successfully',
+  //       });
+  //       this.router.navigate(['teacher']);
+  //     },
+  //     error: (error) => {
+  //       this.errorHandlerService.handleError(error, this.messageService);
+  //     },
+  //   });
+  // }
 
   update() {
     const request = this.editMapToApi(this.form.value);
-    this.studentService
-      .updateStudent(this.form.value.id, request)
+    this.teacherService
+      .updateTeacher(this.form.value.id, request)
       .subscribe({
         next: () => {
           this.messageService.add({
             severity: 'success',
             summary: 'Success',
-            detail: 'Student updated successfully',
+            detail: 'teacher updated successfully',
           });
-          this.router.navigate(['student']);
+          this.router.navigate(['teacher']);
         },
         error: (error) => {
           this.errorHandlerService.handleError(error, this.messageService);
@@ -154,7 +196,7 @@ export class StudentCreateComponent {
       id: data.id,
       fullName: data.fullName,
       dateOfBirth: new Date(data.dateOfBirth), // ✅ مهم لتحويل التاريخ
-      studentNumber: data.studentNumber,
+      teacherNumber: data.teacherNumber,
       address: data.address,
       phoneNumber: data.phoneNumber,
       email: data.email,
@@ -180,19 +222,19 @@ export class StudentCreateComponent {
   initHeaderOptions() {
     this.headerOptions = {
       title:
-        this.pageUrl === 'edit' ? 'Update Student' : 'Create New Student',
+        this.pageUrl === 'edit' ? 'Update teacher' : 'Create New teacher',
       description: 'Fill all required fields',
       containerClass: 'card mb-3 pb-3',
       breadcrumbs: [
         {
-          label: 'Student',
-          routerLink: '/student',
+          label: 'teacher',
+          routerLink: '/teacher',
         },
         {
           label:
             this.pageUrl === 'edit'
-              ? 'Update Student'
-              : 'Create New Student',
+              ? 'Update teacher'
+              : 'Create New teacher',
         },
       ],
       actions: [],
@@ -219,6 +261,23 @@ export class StudentCreateComponent {
           validators: { required: true },
         },
       },
+          {
+        controlType: 'input',
+        colSize: 'col-12 md:col-6',
+        options: {
+          label: 'Teacher Number',
+          formControlName: 'teacherNumber',
+        },
+      },
+            {
+        controlType: 'input',
+        colSize: 'col-12 md:col-6',
+        options: {
+          label: 'Address',
+          formControlName: 'address',
+          validators: { required: true },
+        },
+      },
       {
         controlType: 'input',
         colSize: 'col-12 md:col-6',
@@ -237,12 +296,13 @@ export class StudentCreateComponent {
           validators: { required: true },
         },
       },
+
       {
         controlType: 'input',
         colSize: 'col-12 md:col-6',
         options: {
-          label: 'Address',
-          formControlName: 'address',
+          label: 'Subject',
+          formControlName: 'subject',
           validators: { required: true },
         },
       },
@@ -250,34 +310,29 @@ export class StudentCreateComponent {
         controlType: 'input',
         colSize: 'col-12 md:col-6',
         options: {
-          label: 'Grade Level',
-          formControlName: 'gradeLevel',
+          label: 'Qualification',
+          formControlName: 'qualification',
+        },
+      },
+     {
+        controlType: 'calendar-picker',
+        colSize: 'col-12 md:col-6',
+        options: {
+          label: 'Hire Date',
+          formControlName: 'hireDate',
           validators: { required: true },
         },
       },
       {
-        controlType: 'input',
+        controlType: 'file-upload',
         colSize: 'col-12 md:col-6',
         options: {
-          label: 'Student Number',
-          formControlName: 'studentNumber',
-        },
-      },
-      {
-        controlType: 'input',
-        colSize: 'col-12 md:col-6',
-        options: {
-          label: 'Parent Name',
-          formControlName: 'parentName',
-        },
-      },
-      {
-        controlType: 'input',
-        colSize: 'col-12 md:col-6',
-        options: {
-          label: 'Parent Phone Number',
-          formControlName: 'parentPhoneNumber',
-        },
+          label: 'Profile Image',
+          formControlName: 'profileImagePath',
+          validators: { required: true },
+          multiple: false,
+          accept: 'image/*',
+        },    
       },
     ];
 

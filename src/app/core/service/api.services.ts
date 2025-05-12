@@ -7,11 +7,23 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class ApiServices<T> {
-  private baseUrl = environment.apiBaseUrl;
+  public baseUrl = environment.apiBaseUrl;
   private formatEndpoint(endpoint: string): string {
     return endpoint.replace(/^\/+|\/+$/g, ''); // يزيل أي سلاش في البداية أو النهاية
   }
+
+  
+  getBaseUrl(): string {
+    return this.baseUrl;
+  }
+  
   constructor(private http: HttpClient) {}
+
+  // 🆕 دالة لجلب البيانات مع معلمات استعلام (pagination, search, filter...)
+getWithParams<R>(endpoint: string, params: { [key: string]: any }): Observable<R> {
+  const httpParams = new HttpParams({ fromObject: params });
+  return this.http.get<R>(`${this.baseUrl}${this.formatEndpoint(endpoint)}`, { params: httpParams });
+}
 
 // مثال في getAll:
 getAll(endpoint: string, params?: HttpParams): Observable<T[]> {

@@ -1,0 +1,13 @@
+<app-page-heading *ngIf="headerOptions" [pageHeaderOptions]="headerOptions">
+</app-page-heading>
+<div class="card border-round-2xl" #formContainerRef *ngIf="form">
+    <kitsng-form-factory 
+    [fields]="formFields"
+    [form]="form"
+></kitsng-form-factory>
+<div class="flex justify-content-end gap-1">
+    <p-button type="submit" [label]="pageUrl=='edit'? 'Update': 'Submit'" (onClick)="submit()" [disabled]="form.disabled" [loading]="form.disabled"></p-button>
+    <p-button  label="Cancel" (onClick)="back()" [disabled]="form.disabled"></p-button>
+  </div>
+</div>
+<p-toast></p-toast>
