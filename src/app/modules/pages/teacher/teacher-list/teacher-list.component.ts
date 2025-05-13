@@ -50,7 +50,7 @@ export class TeacherListComponent implements OnInit {
     this._getData.unsubscribe();
   }
   fetchTeachersData() {
-    this.teacherService.getAllTeachers().subscribe({
+    this.teacherService.getAllTeacher().subscribe({
       next: (response: Teacher[]) => {
         if (this.query) {
           const q = this.query.toLowerCase();
@@ -125,7 +125,28 @@ export class TeacherListComponent implements OnInit {
               this.router.navigate([ 'teacher','edit', teacher.id]);
           },
           colorClass: 'p-button-info',
-        }
+        },
+         {
+                  icon: 'pi pi-trash',
+                  onClick: (teacher: Teacher) => {
+                    if (confirm(`Are you sure you want to delete ${teacher.fullName}?`)) {
+                      this.teacherService.deleteTeacher(teacher.id).subscribe({
+                        next: () => {
+                          this.messageService.add({
+                            severity: 'success',
+                            summary: 'Deleted',
+                            detail: `Teacher ${teacher.fullName} deleted successfully.`,
+                          });
+                          this._getData.next();
+                        },
+                        error: (error) => {
+                          this.errorHandlerService.handleError(error, this.messageService);
+                        }
+                      });
+                    }
+                  },
+                  colorClass: 'p-button-danger',
+                }
       ],
       onSelectedItems: (e) => {
         console.log('Selected teachers', e);
