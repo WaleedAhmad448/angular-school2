@@ -41,6 +41,13 @@ export class AppMenuComponent implements OnInit, AfterViewInit {
                 routerLink: ['/docTypes'],
                 role: this.isAdmin,
             },
+             {
+                label: 'Administrator',
+                icon: 'pi pi-fw pi-file',
+                routerLink: ['/administrator'],
+                role: this.isAdmin,
+            },
+
             {
                 label: 'Student',
                 icon: 'pi pi-fw pi-file',
@@ -48,7 +55,7 @@ export class AppMenuComponent implements OnInit, AfterViewInit {
                 role: this.isAdmin,
             },
 
-                {
+            {
                 label: 'Teacher',
                 icon: 'pi pi-fw pi-file',
                 routerLink: ['/teacher'],

@@ -39,23 +39,14 @@ const routes: Routes = [
                     ).then((m) => m.PageListFactoryModule),
                 resolve: { pageConfig: DocTypesResolver },
             },
-                        
-            // {
-            //     path: 'student',
-            //     loadChildren: () =>
-            //         import(
-            //             './modules/page-list-factory/page-list-factory.module'
-            //         ).then((m) => m.PageListFactoryModule),
-            //     resolve: { pageConfig: StudentResolver },
-            // },
 
-            //   {
-            //     path: 'student',
-            //     component: StudentComponent,
-            //     resolve: {
-            //     pageConfig: StudentResolver
-            //     }
-            // },
+            {
+                path: 'administrator',
+                loadChildren: () =>
+                    import('./modules/pages/administrator/administrator-routing.modULE').then(
+                        (m) => m.AdministratorRoutingModule
+                    ),
+            },
             {
                 path: 'student',
                 loadChildren: () =>

@@ -16,7 +16,7 @@ export class ApiServices<T> {
     return endpoint.replace(/^\/+|\/+$/g, ''); // يزيل / من البداية والنهاية
   }
 
-  private getFullUrl(endpoint: string): string {
+  public getFullUrl(endpoint: string): string {
     return `${this.baseUrl}/${this.formatEndpoint(endpoint)}`;
   }
 
