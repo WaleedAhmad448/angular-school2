@@ -145,6 +145,7 @@ export class StudentCreateComponent {
   editMapToApi(data: any) {
     return {
       ...data,
+      dateOfBirth: new Date(data.dateOfBirth).toISOString(), // ✅ التحويل الصحيح
       updatedAt: new Date().toISOString(),
     };
   }

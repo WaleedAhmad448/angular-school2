@@ -1,72 +1,62 @@
 import { Injectable } from '@angular/core';
-import { ApiServices } from './api.services';
-import { Teacher, PagedResult, TeacherRegistrationDto } from '../model/teacher.model';
+import { ApiServices } from './api.services'; // تأكد من مسار الاستيراد الصحيح
+import { Teacher, TeacherRegistrationDto, PagedResult } from '../model/teacher.model'; // تأكد من مسار الاستيراد الصحيح
 import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpParams } from '@angular/common/http';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class TeacherService {
-  private endpoint = 'Teacher';
+  private endpoint = 'Teacher'; // تأكد من أن هذا هو الـ endpoint الصحيح
 
-  constructor(private api: ApiServices<Teacher>,
-              private http: HttpClient
+  constructor(private apiService: ApiServices<Teacher>) {}
 
-  ) {}
-
-  // الحصول على المدرسين مع تقسيم الصفحات + البحث
-  getPagedTeachers(page = 1, pageSize = 10, search: string = ''): Observable<PagedResult<Teacher>> {
-    const params: any = {
-      page: page,
-      pageSize: pageSize,
-    };
-    if (search) {
-      params.search = search;
-    }
-
-    return this.api.getWithParams<PagedResult<Teacher>>(this.endpoint, params);
-  }
-
-  // الحصول على جميع المدرسين
+  
+  // الحصول على جميع المعلمين
   getAllTeachers(): Observable<Teacher[]> {
-    return this.api.getAll(this.endpoint);
+    return this.apiService.getAll(this.endpoint);
   }
-  // الحصول على مدرس واحد
+
+  // الحصول على معلم واحد حسب الـ ID
   getTeacherById(id: number): Observable<Teacher> {
-    return this.api.getById(this.endpoint, id);
+    return this.apiService.getById(this.endpoint, id);
   }
 
-  // تسجيل مدرس جديد
+  // تسجيل معلم جديد
   registerTeacher(data: TeacherRegistrationDto): Observable<Teacher> {
-    return this.api.create(this.endpoint, data as unknown as Teacher);
+    const newTeacher: Teacher = {
+      id: 0,  // أو استخدم أي قيمة افتراضية مناسبة
+      teacherNumber: '',  // يجب أن يكون قيمة افتراضية
+      hireDate: '',  // يجب أن يكون قيمة افتراضية
+      ...data
+    };
+    return this.apiService.create(this.endpoint, newTeacher);
   }
 
-  // تعديل بيانات مدرس
+  // تحديث بيانات معلم
   updateTeacher(id: number, data: TeacherRegistrationDto): Observable<Teacher> {
-    return this.api.update(this.endpoint, id, data as unknown as Teacher);
+    const updatedTeacher: Teacher = {
+      id: id,  // استخدم الـ id الذي تم تمريره
+      teacherNumber: '',  // يجب أن يكون قيمة صحيحة
+      hireDate: '',  // يجب أن يكون قيمة صحيحة
+      ...data
+    };
+    return this.apiService.update(this.endpoint, id, updatedTeacher);
   }
 
-  // حذف مدرس
+  // حذف معلم
   deleteTeacher(id: number): Observable<void> {
-    return this.api.delete(this.endpoint, id);
+    return this.apiService.delete(this.endpoint, id);
   }
 
-  // رفع صورة (اختياري)
-  uploadProfileImage(id: number, file: File): Observable<any> {
-    const formData = new FormData();
-    formData.append('file', file);
-    return this.api.postFormData(`${this.endpoint}/${id}/upload-image`, formData);
-  }
+  // الحصول على المعلمين مع تقسيم الصفحات
+  getPagedTeachers(page: number, pageSize: number, search: string = ''): Observable<PagedResult<Teacher>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('pageSize', pageSize.toString())
+      .set('search', search);
 
-  uploadTeacherImage(fileData: FormData): Observable<{ imagePath: string }> {
-    const url = `${this.api.getBaseUrl()}/Teacher/upload-profile-image`;
-    return this.http.post<{ imagePath: string }>(url, fileData);
-  }
-
-
-  // حذف صورة (اختياري)
-  deleteProfileImage(id: number): Observable<void> {
-    return this.api.delete(`${this.endpoint}/delete-image`, id);
+    return this.apiService.getWithParams<PagedResult<Teacher>>(this.endpoint, params);
   }
 }

@@ -1,42 +1,47 @@
 import { Injectable } from '@angular/core';
 import { ApiServices } from './api.services';
-import { Student } from '../model/student.model';
-import { StudentRegistrationDto } from '../model/student.model';
+import { Student, StudentRegistrationDto } from '../model/student.model';
 import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StudentService {
 
-  private endpoint = 'StudentRegistration'; // تأكد أنه يطابق مسار الـ API في الباكند
-  constructor(private api: ApiServices<Student>, private http: HttpClient) {}
-  private basUrl = environment.apiBaseUrl;
+  private endpoint = 'StudentRegistration';
 
-  
+  constructor(private apiService: ApiServices<Student>, private http: HttpClient) {}
+
   getAllStudents(): Observable<Student[]> {
-    return this.api.getAll(this.endpoint);
+    return this.apiService.getAll(this.endpoint);
   }
 
   getStudentById(id: number): Observable<Student> {
-    return this.api.getById(this.endpoint, id);
+    return this.apiService.getById(this.endpoint, id);
   }
 
   registerStudent(data: StudentRegistrationDto): Observable<Student> {
-    return this.api.create(this.endpoint, data as unknown as Student);
+    return this.apiService.create(this.endpoint, data as Student);
   }
-  
+
   updateStudent(id: number, data: StudentRegistrationDto): Observable<Student> {
-    return this.api.update(this.endpoint, id, data as unknown as Student);
+    return this.apiService.update(this.endpoint, id, data as Student);
   }
 
   deleteStudent(id: number): Observable<void> {
-    return this.api.delete(this.endpoint, id);
+    return this.apiService.delete(this.endpoint, id);
+  }
+
+  getPagedStudents(page: number, pageSize: number, search: string = ''): Observable<Student[]> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('pageSize', pageSize.toString())
+      .set('search', search);
+    return this.apiService.getAll(this.endpoint, params);
   }
 
   uploadStudentPhoto(studentId: number, file: File): Observable<any> {
-    return this.api.uploadFile(`${this.endpoint}/upload-photo`, file, { studentId });
+    return this.apiService.uploadFile(`${this.endpoint}/upload-photo`, file, { studentId });
   }
 }

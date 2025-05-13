@@ -122,9 +122,30 @@ export class StudentListComponent implements OnInit {
         {
           icon: 'pi pi-pencil',
           onClick: (student: Student) => {
-              this.router.navigate([ 'student','edit', student.id]);
+            this.router.navigate(['student', 'edit', student.id]);
           },
           colorClass: 'p-button-info',
+        },
+        {
+          icon: 'pi pi-trash',
+          onClick: (student: Student) => {
+            if (confirm(`Are you sure you want to delete ${student.fullName}?`)) {
+              this.studentService.deleteStudent(student.id).subscribe({
+                next: () => {
+                  this.messageService.add({
+                    severity: 'success',
+                    summary: 'Deleted',
+                    detail: `Student ${student.fullName} deleted successfully.`,
+                  });
+                  this._getData.next();
+                },
+                error: (error) => {
+                  this.errorHandlerService.handleError(error, this.messageService);
+                }
+              });
+            }
+          },
+          colorClass: 'p-button-danger',
         }
       ],
       onSelectedItems: (e) => {
