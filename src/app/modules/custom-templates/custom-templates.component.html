@@ -71,6 +71,11 @@
 </ng-template> -->
 
 <!-- // clinic Module templates -->
+<ng-template kitsngTemplate let-row let-column="column" let-value="value">
+  <ng-container *ngIf="column.field === 'photo'">
+    <img [src]="value" alt="Student Photo" width="50" height="50" style="object-fit: cover; border-radius: 5px;" />
+  </ng-container>
+</ng-template>
 
 <ng-template #yesNoCustomTemplateRef let-x>
     <p-tag

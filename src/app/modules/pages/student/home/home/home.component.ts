@@ -18,7 +18,7 @@ export class HomeComponent {
   faArrowLeft = faArrowLeft;
   faDelete =faTimes;
 
-  // localDomain = 'http://localhost:8080';
+  localDomain = 'http://localhost:8080';
 
   showDialog: boolean = true;
 

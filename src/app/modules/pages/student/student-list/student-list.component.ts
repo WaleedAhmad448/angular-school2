@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, inject, OnInit, ViewChild, ElementRef, TemplateRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { KitsngTableConfig, KitsngTableFactoryModule } from 'kitsng-table-factory';
 import { MessageService } from 'primeng/api';
@@ -34,6 +34,7 @@ export class StudentListComponent implements OnInit {
 
   tableConfig!: KitsngTableConfig;
   headerOptions!: PageHeadeingOptions;
+  photoTemplate: TemplateRef<any> | undefined;
 
   constructor(
     private errorHandlerService: ErrorHandlerService,
@@ -54,17 +55,33 @@ export class StudentListComponent implements OnInit {
     this._getData.unsubscribe();
   }
 
-  fetchStudentsData() {
-    this.studentService.getAllStudents().subscribe({
-      next: (response: Student[]) => {
-        this.students = response;
-        this.tableConfig.data = response;
-      },
-      error: (error) => {
-        this.errorHandlerService.handleError(error, this.messageService);
-      }
-    });
-  }
+  // fetchStudentsData() {
+  //   this.studentService.getAllStudents().subscribe({
+  //     next: (response: Student[]) => {
+  //       this.students = response;
+  //       this.tableConfig.data = response;
+  //     },
+  //     error: (error) => {
+  //       this.errorHandlerService.handleError(error, this.messageService);
+  //     }
+  //   });
+  // }
+fetchStudentsData() {
+  this.studentService.getAllStudents().subscribe({
+    next: (response: Student[]) => {
+      this.students = response;
+
+      this.tableConfig.data = [...this.students]; // 🔁 نسخ البيانات
+      this.tableConfig.totalRecords = this.students.length; // 🔢 تحديد عدد السجلات
+
+      console.log('Students loaded:', this.students); // ✅ تحقق من البيانات
+    },
+    error: (error) => {
+      this.errorHandlerService.handleError(error, this.messageService);
+    }
+  });
+}
+
 
 
   clearSearch() {
@@ -170,10 +187,12 @@ initTableConfig() {
       {
         field: 'photo',
         header: 'Photo',
-        type: 'image'
+        template: this.photoTemplate,
       },
+
     ],
-    data: [],
+    data: this.students,
+    rowHover: true,
     pageSize: 10,
     first: 0,
     showPaginator: true,
