@@ -8,6 +8,8 @@ export const environment = {
     apiBaseUrl: 'http://localhost:5199/api',
     imageBaseUrl: 'http://localhost:5199/uploads',
     platform: 'kitsys',
+    baseUrl: 'http://localhost:8080' // API للتطوير
+
 
 
  };

@@ -5,7 +5,7 @@ import { Student } from '../model/student.model';
 import { environment } from '../../../environments/environment';
 
 const endpoint = 'student';
-const baseUrl = `${environment.apiBaseUrl}/${endpoint}`;
+const baseUrl = `${environment.baseUrl}/${endpoint}`;
 
 @Injectable({
   providedIn: 'root'

@@ -8,7 +8,7 @@ import { environment } from '../../../environments/environment';
 })
 export class GenerService<T> {
 
-  private baseApiUrl = environment.apiBaseUrl;
+  private baseApiUrl = environment.baseUrl;
 
   constructor(private http: HttpClient) {}
 

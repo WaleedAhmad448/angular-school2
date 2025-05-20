@@ -51,7 +51,6 @@
     "@types/lodash": "^4.17.0",
     "alasql": "^4.2.3",
     "chart.js": "^3.9.1",
-    "ckeditor5-custom-build": "file:./ckeditor5-custom-build-0.0.1.tgz",
     "dayjs": "^1.11.10",
     "echarts": "^5.4.3",
     "file-saver": "^2.0.5",
