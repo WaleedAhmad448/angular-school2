@@ -40,15 +40,8 @@ export class AdministratorService {
         .set('search', search);
       return this.apiService.getAll(this.endpoint, params);
     }
-  
-    uploadAdministratorPhoto(AdministratorId: number, file: File): Observable<any> {
-      return this.apiService.uploadFile(`${this.endpoint}/uploads`, file, { AdministratorId });
-    }
-    getAdministratorPhoto(AdministratorId: number): Observable<any> {
-      return this.apiService.getById(`${this.endpoint}/uploads`, AdministratorId);
-    }
-    deleteAdministratorPhoto(AdministratorId: number): Observable<any> {
-      return this.apiService.delete(`${this.endpoint}/uploads`, AdministratorId);
+    getImageUrl(imagePath: string): string {
+      return this.apiService.getFullUrl(imagePath);
     }
 
 }

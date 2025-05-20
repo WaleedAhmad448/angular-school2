@@ -21,7 +21,8 @@
                         "google-libphonenumber",
                         "lodash",
                         "quill",
-                        "quill-delta"
+                        "quill-delta",
+                        "sweetalert2"
                     ],
                       "outputPath": "dist/angular-school",
                       "index": "src/index.html",

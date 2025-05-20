@@ -6,8 +6,8 @@ import { MessageService } from 'primeng/api';
 import { debounceTime, Observable, Subject } from 'rxjs';
 import { PageHeadeingOptions, PageHeading } from 'src/app/common/page-heading/page-heading.component';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { Student } from 'src/app/core/model/student.model';
-import { StudentService } from 'src/app/core/service/student.service';
+import { Student } from 'src/app/core/model/students.model';
+import { StudentService } from 'src/app/core/service/students.service';
 import { ErrorHandlerService } from 'src/app/core/service/error-handler.service';
 
 @Component({

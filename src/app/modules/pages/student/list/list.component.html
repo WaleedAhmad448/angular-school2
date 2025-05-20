@@ -1,0 +1,58 @@
+<div class="mr-4">
+  <div class="p-4" *ngIf="!isAddingStudent">
+    <div class="flex justify-between items-center mb-4">
+      <div class="flex space-x-2">
+        <input type="text" [(ngModel)]="Search" (input)="onSearch()" placeholder="Search"
+              class="w-80 border border-gray-300 px-4 py-2 rounded-md text-lg">
+        <button class="bg-green-500 text-white px-4 py-2 rounded"  (click)="openCreateDialog()">Add Student</button>
+      </div>
+    
+      <div class="flex space-x-2">
+        <button class="bg-teal-700 text-white px-4 py-2 rounded" (click)="triggerFileInput()">Import</button>
+        <input id="importFileInput" type="file" #importFileInput hidden (change)="onFileChange($event)">
+        <button class="bg-blue-500 text-white px-4 py-2 rounded" (click)="exportToExcel()">Export</button>
+      </div>
+    </div>
+  </div>
+
+    <!-- Data table -->
+    <div *ngIf="!isAddingStudent" class="overflow-x-auto">
+      <table class="min-w-full bg-white border border-gray-200">
+        <thead>
+          <tr class="w-full bg-gray-100 border-b">
+            <th class="text-left py-2 px-4">ID</th>
+            <th class="text-left py-2 px-4">Name</th>
+            <th class="text-left py-2 px-4">Nrc No</th>
+            <th class="text-left py-2 px-4">Age</th>
+            <th class="text-left py-2 px-4">Gender</th>
+            <th class="text-left py-2 px-4">Photo</th>
+            <th class="text-left py-2 px-4">Actions</th>
+          </tr>
+        </thead>
+        
+        <tbody>
+          <tr *ngFor="let student of students" class="border-b hover:bg-gray-50">
+            <td class="py-2 px-4">{{ student.studentId }}</td> 
+            <td class="py-2 px-4">{{ student.studentName }}</td>
+            <td class="py-2 px-4">{{ student.studentNrc }}</td>
+            <td class="py-2 px-4">{{ student.age }}</td>
+            <td class="py-2 px-4">{{ student.gender }}</td>
+            <td class="py-2 px-4">
+                  <img [src]="localDomain + student.photo" alt="Student Photo"
+                      class="w-9 h-9 rounded-full object-cover" />
+                </td>
+            <td class="py-2 px-4 flex space-x-2">
+                  <a [routerLink]="['/details', student.studentId]"
+                    class="bg-green-500 text-white px-2 py-1 rounded flex items-center justify-center">
+                    <fa-icon [icon]="faPencil"></fa-icon>
+                  </a>
+                  <button (click)="openDeleteDialog(student.studentId)"
+                          class="bg-red-500 text-white px-2 py-1 rounded">
+                    <fa-icon [icon]="faTrash"></fa-icon>
+                  </button>
+            </td>
+          </tr> 
+        </tbody>
+      </table>
+    </div>
+  </div>

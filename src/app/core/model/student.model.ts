@@ -1,24 +1,17 @@
-export interface Student {
-  id: number;
-  fullName: string;
-  dateOfBirth: string;
-  studentNumber: string;
-  address: string;
-  phoneNumber: string;
-  email: string;
-  gradeLevel: number;
-  parentName?: string;
-  parentPhoneNumber?: string;
-  registrationDate: string;
-}
+import { Gender } from './gender.enum';
+import { Mark } from './Mark.model';
+export class Student {
 
-export interface StudentRegistrationDto {
-  fullName: string;
-  dateOfBirth: string;
-  address: string;
-  phoneNumber: string;
-  email: string;
-  gradeLevel: number;
-  parentName?: string;
-  parentPhoneNumber?: string;
+    date?: Date;
+    studentId?: any;
+    studentName ?: string;
+    studentNrc?: string;
+    age?: number;
+    dateOfBirth?: Date;
+    fatherName?: string;    
+    gender?: Gender;
+    address?: string;
+    township?: string;
+    photo?: string;
+    mark!: Mark[];
 }

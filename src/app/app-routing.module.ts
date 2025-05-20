@@ -40,13 +40,13 @@ const routes: Routes = [
                 resolve: { pageConfig: DocTypesResolver },
             },
 
-            {
-                path: 'administrator',
-                loadChildren: () =>
-                    import('./modules/pages/administrator/administrator-routing.modULE').then(
-                        (m) => m.AdministratorRoutingModule
-                    ),
-            },
+            // {
+            //     path: 'administrator',
+            //     loadChildren: () =>
+            //         import('./modules/pages/administrator/administrator-routing.modULE').then(
+            //             (m) => m.AdministratorRoutingModule
+            //         ),
+            // },
             {
                 path: 'student',
                 loadChildren: () =>

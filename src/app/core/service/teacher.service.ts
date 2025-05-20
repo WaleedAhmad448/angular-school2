@@ -1,46 +1,44 @@
 import { Injectable } from '@angular/core';
-import { ApiServices } from './api.services'; // تأكد من مسار الاستيراد الصحيح
-import { Teacher, TeacherRegistrationDto, PagedResult } from '../model/teacher.model'; // تأكد من مسار الاستيراد الصحيح
-import { Observable } from 'rxjs';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { GenerService } from '../service/gener.service';
+import { Teacher } from '../model/teachers.model'; // تأكد من مسار الاستيراد الصحيح
 
 @Injectable({
   providedIn: 'root'
 })
 export class TeacherService {
-  private endpoint = 'Teacher'; // تأكد من أن هذا هو الـ endpoint الصحيح
+  private endpoint = 'teacher';
 
-  constructor(private apiService: ApiServices<Teacher>, private http: HttpClient) {}
+  constructor(private api: GenerService<Teacher>) {}
 
-  getAllTeacher(): Observable<Teacher[]> {
-    return this.apiService.getAll(this.endpoint);
+  getAll() {
+    return this.api.getAll(this.endpoint);
   }
 
-  getTeacherById(id: number): Observable<Teacher> {
-    return this.apiService.getById(this.endpoint, id);
+  getById(id: number) {
+    return this.api.getById(this.endpoint, id);
   }
 
-  registerTeacher(data: TeacherRegistrationDto): Observable<Teacher> {
-    return this.apiService.create(this.endpoint, data as Teacher);
+  searchByName(name: string) {
+    return this.api.searchByName(this.endpoint, 'fullName', name);
   }
 
-  updateTeacher(id: number, data: TeacherRegistrationDto): Observable<Teacher> {
-    return this.apiService.update(this.endpoint, id, data as Teacher);
+  create(teacher: Teacher) {
+    return this.api.create(this.endpoint, teacher);
   }
 
-  deleteTeacher(id: number): Observable<void> {
-    return this.apiService.delete(this.endpoint, id);
+  update(id: number, teacher: Teacher) {
+    return this.api.update(this.endpoint, id, teacher);
   }
 
-  getPagedTeachers(page: number, pageSize: number, search: string = ''): Observable<Teacher[]> {
-    const params = new HttpParams()
-      .set('page', page.toString())
-      .set('pageSize', pageSize.toString())
-      .set('search', search);
-    return this.apiService.getAll(this.endpoint, params);
+  delete(id: number) {
+    return this.api.delete(this.endpoint, id);
   }
 
-  uploadTeacherPhoto(TeacherId: number, file: File): Observable<any> {
-    return this.apiService.uploadFile(`${this.endpoint}/upload-photo`, file, { TeacherId });
+  importTeachers(file: File) {
+    return this.api.importFile(this.endpoint, file);
+  }
+
+  exportTeachers() {
+    return this.api.export(this.endpoint);
   }
 }

@@ -1,0 +1,158 @@
+<div *ngIf="showDialog" class="dialog">
+  <div class="container mx-auto max-w-3xl relative">
+    <div class="bg-white shadow-md rounded-lg p-4">
+
+      <button  class="text-red-600 px-2 py-1 rounded top-2 right-2" (click)="close()">
+        <fa-icon [icon]="faArrowLeft" class="text-lg"></fa-icon>
+      </button>
+
+      <h2 class="text-xl text-center font-bold mb-0">Input Student Information</h2>
+      <form>
+
+        <div class="form-group mb-4">
+          <label class="block text-sm font-medium text-gray-700">Date:</label>
+          <input type="date"
+          id="date" 
+          required
+          [(ngModel)] = "student.date"
+          name="date"
+          placeholder="Select Date"
+          min="2000-01-01"
+  
+          class="mt-1 block  border
+          border-gray-300 rounded-md shadow-sm 
+          py-2 px-3 focus:outline-none
+          focus:ring-indigo-500
+          focus:border-indigo-500">
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <div class="form-group mb-4">
+              <label class="block text-sm font-medium text-gray-700">Name:</label>
+              <input type="text" id="studentName" required [(ngModel)]="student.studentName" name="name"
+                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-1 px-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div class="form-group mb-4">
+              <label class="block text-sm font-medium text-gray-700">Date of Birth:</label>
+              <input type="date" id="dateOfBirth" required [(ngModel)]="student.dateOfBirth" name="BirthDay"
+                min="1990-01-01" max="2020-12-31"
+                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-1 px-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div class="form-group mb-4">
+              <label class="block text-sm font-medium text-gray-700">Father Name:</label>
+              <input type="text" id="fatherName" required [(ngModel)]="student.fatherName" name="Father Name"
+                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-1 px-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+          </div>
+          <div>
+            <div class="form-group mb-4">
+              <label class="block text-sm font-medium text-gray-700">Nrc No:</label>
+              <input type="text" id="studentNrc" required [(ngModel)]="student.studentNrc" name="Nrc NO"
+                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-1 px-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div class="form-group mb-4">
+              <label class="block text-sm font-medium text-gray-700">Age:</label>
+              <input type="number" id="age" required [(ngModel)]="student.age" name="age"
+                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-1 px-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div class="form-group mb-4">
+              <label class="block text-sm font-medium text-gray-700">Township:</label>
+              <input type="text" id="township" required [(ngModel)]="student.township" name="township"
+                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-1 px-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+          </div>
+        </div>
+        <div class="form-group mb-4">
+          <label class="block text-sm font-medium text-gray-700">Address:</label>
+          <input type="text" id="address" required [(ngModel)]="student.address" name="address"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-1 px-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+        <div class="form-group mb-5">
+          <label class="block text-sm font-medium text-gray-700">Gender:</label>
+          <div class="mt-2">
+            <label class="inline-flex items-center">
+              <input type="radio" name="gender" [(ngModel)]="selectedGender" [value]="genderEnum.MALE" required
+                class="form-radio text-indigo-600">
+              <span class="ml-2">Male</span>
+            </label>
+            <label class="inline-flex items-center ml-6">
+              <input type="radio" name="gender" [(ngModel)]="selectedGender" [value]="genderEnum.FEMALE" required
+                class="form-radio text-indigo-600">
+              <span class="ml-2">Female</span>
+            </label>
+          </div>
+        </div>
+         
+        <div class="form-group mb-4">
+        <label for="photo" class="flex items-center flex-col">
+          <div class="border-b border-gray-300 w-full cursor-pointer relative">
+            <input type="file" id="photo" class="mr-2 hidden" (change)="onFileSelected($event)" #fileInput>
+            <strong class="absolute inset-x-0 bottom-0 text-xs text-gray-500">Choose Input Photo</strong>
+          </div> 
+          <div *ngIf="imagePreviewUrl" class="preview mt-7"> 
+            <img [src]="imagePreviewUrl" alt="preview" class="w-24 h-24 object-cover">
+          </div>
+        </label>
+      </div>
+        
+        <div class="form-group mb-4 flex justify-center" >
+          <button type="button" (click)="showAdditionalFields()" 
+            class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-2 rounded-lg">
+            {{ showAdditional ? 'Close' : 'Additional' }}
+          </button>
+        </div>
+        
+        <div *ngIf="showAdditional" class="flex flex-col gap-4">
+          <div *ngFor="let mark of student.mark; let i = index" class="grid grid-cols-1 md:grid-cols-6 gap-4">
+            <div class="form-group mb-4">
+              <label class="block text-sm font-medium text-gray-700">Date:</label>
+              <input type="date" [(ngModel)]="student.mark[i].date" name="date-{{i}}"
+                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-1 px-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div class="form-group mb-4">
+              <label class="block text-sm font-medium text-gray-700">Mark 1:</label>
+              <input type="number" [(ngModel)]="student.mark[i].mark1" name="mark1-{{i}}" (ngModelChange)="calculateTotal(i)"
+                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-1 px-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div class="form-group mb-4">
+              <label class="block text-sm font-medium text-gray-700">Mark 2:</label>
+              <input type="number" [(ngModel)]="student.mark[i].mark2" name="mark2-{{i}}" (ngModelChange)="calculateTotal(i)"
+                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-1 px-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div class="form-group mb-4">
+              <label class="block text-sm font-medium text-gray-700">Mark 3:</label>
+              <input type="number" [(ngModel)]="student.mark[i].mark3" name="mark3-{{i}}" (ngModelChange)="calculateTotal(i)"
+                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-1 px-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div class="form-group mb-4">
+              <label class="block text-sm font-medium text-gray-700">Total:</label>
+              <div>{{ student.mark[i].total }}</div>
+            </div>
+            <div class="form-group mb-4 flex justify-center">
+              <button type="button" (click)="remove(i)"
+                class="bg-red-500 hover:bg-red-700 text-gray-800 font-bold py-2 px-2 rounded-lg">
+                remove
+              </button>
+            </div>
+          </div>
+          <!-- Add button -->
+         <div class="form-group mb-4 flex justify-center">
+          <button type="button" (click)="add()"
+            class="bg-green-500 hover:bg-green-300 text-gray-800 font-bold py-2 px-4 rounded-lg">
+            Add
+          </button>
+        </div>
+        </div>
+
+        <div *ngIf="showAdditional" class="form-group mb-4 flex justify-center space-x-4">
+          <button type="button"
+            class="btn btn-primary bg-indigo-500 text-white py-2 px-4 rounded-md hover:bg-indigo-600"
+            (click)="saveStudent()">SAVE</button>
+          <button type="button" class="btn btn-secondary bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600"
+            (click)="onCancel()">CANCEL</button>
+        </div> 
+      </form>
+    </div>
+  </div>
+</div>

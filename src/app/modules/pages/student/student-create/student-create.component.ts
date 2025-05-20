@@ -13,7 +13,7 @@ import {
   PageHeading,
 } from 'src/app/common/page-heading/page-heading.component';
 import { ErrorHandlerService } from 'src/app/core/service/error-handler.service';
-import { StudentService } from 'src/app/core/service/student.service';
+import { StudentService } from 'src/app/core/service/students.service';
 import { SharedModule } from 'src/app/shared/shared.module';
 
 @Component({
