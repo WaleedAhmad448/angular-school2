@@ -5,6 +5,7 @@ import { AppComponent } from './app.component';
 import { AppLayoutModule } from './layout/app.layout.module';
 import { CustomTemplatesModule } from './modules/custom-templates/custom-templates.module';
 import { FormsModule } from '@angular/forms';
+import { ConfirmationService } from 'primeng/api/confirmationservice';
 
 @NgModule({
     declarations: [
@@ -18,7 +19,7 @@ import { FormsModule } from '@angular/forms';
         CustomTemplatesModule,
     ],
     providers: [
-        { provide: LocationStrategy, useClass: HashLocationStrategy }
+        { provide: LocationStrategy, useClass: HashLocationStrategy },
     ],
     bootstrap: [AppComponent]
 })

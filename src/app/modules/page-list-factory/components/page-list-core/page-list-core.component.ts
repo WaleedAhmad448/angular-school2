@@ -26,8 +26,8 @@ export class PageListCoreComponent implements OnInit, OnDestroy {
   searchQ = "";
   filters: any;
   orders: any;
-  _getData: Subject<void> = new Subject();
-  getData$: Observable<void> = this._getData.asObservable();
+  _getData!: Subject<void>;
+  getData$!: Observable<void>;
   ref!: DynamicDialogRef;
 
   constructor(
@@ -43,12 +43,22 @@ export class PageListCoreComponent implements OnInit, OnDestroy {
     // get data from route
     this.route.data.subscribe((data) => {
       this.pageConfig = data["pageConfig"];
-      console.log(this.pageConfig);
+    //   console.log(this.pageConfig);
       this.apiService._initService(
         this.pageConfig.module,
         this.pageConfig.entity,
-        // this.pageConfig.version
+        this.pageConfig.version,
+        this.pageConfig.apiPath
       );
+      if (this.pageConfig.onInit) {
+        this.pageConfig.onInit();
+      }
+      if (this.pageConfig.tableConfig?.fetchApiInfo?._getData) {
+        this._getData = this.pageConfig?.tableConfig?.fetchApiInfo?._getData;
+      } else {
+        this._getData = new Subject();
+      }
+      this.getData$ = this._getData.asObservable();
       this.subscribeToData();
     });
   }
@@ -93,27 +103,49 @@ export class PageListCoreComponent implements OnInit, OnDestroy {
       if (this.searchQ != null || this.searchQ != undefined) {
         query["search"] = this.searchQ;
       }
+        if (this.pageConfig.mainFilters) {
+            query["filters"] = this.pageConfig.mainFilters;
+        }
         if (this.filters) {
-            query["filters"] = this.filters.reduce((obj: any, item: any) => {
+            const filters = this.filters.reduce((obj: any, item: any) => {
                 for (const key in item) {
                     if (item.hasOwnProperty(key)) {
                         obj[key] = item[key];
                     }
                 }
                 return obj;
-              }, {});
+                }, {});
+                query["filters"] = {...(query["filters"] ?? {}), ...filters};
+        }
+        if (this.pageConfig.mainOrders) {
+            query["orders"] = this.pageConfig.mainOrders;
         }
         if (this.orders) {
-          query["orders"] = this.orders;
+            query["orders"] = this.orders;
+        }
+        if (this.pageConfig.apiPath) {
+            this.apiService._initService(
+                this.pageConfig.module,
+                this.pageConfig.entity,
+                this.pageConfig.version,
+                this.pageConfig.apiPath
+            )
         }
       this.apiService.getPaged(query).subscribe({
         next: (res) => {
-            console.log(res);
+            // console.log(res);
             if (!res.pageInfo && res.page) {
                 res.pageInfo = res.page;
             }
           this.pageConfig.tableConfig.totalRecords = res.pageInfo.totalItems;
           this.pageConfig.tableConfig.data = res.items ?? [];
+
+          if (this.pageConfig.tableConfig?.fetchApiInfo?.onDataLoaded) {
+            this.pageConfig.tableConfig?.fetchApiInfo?.onDataLoaded(
+              this.pageConfig.tableConfig.data,
+              res.pageInfo
+            );
+          }
         },
         error: (error) => {
           this.errorHandlerService.handleError(error, this.messageService);
@@ -122,7 +154,7 @@ export class PageListCoreComponent implements OnInit, OnDestroy {
     });
   }
   addItem() {
-    console.log("Add Item From the page list component");
+    // console.log("Add Item From the page list component");
     if (this.pageConfig?.formConfig?.type == "route") {
       this.router.navigate(["add"], { relativeTo: this.route });
     } else {
@@ -130,7 +162,7 @@ export class PageListCoreComponent implements OnInit, OnDestroy {
     }
   }
   editItem(item: any) {
-    console.log("Update Item From the page list component");
+    // console.log("Update Item From the page list component");
     if (this.pageConfig?.formConfig?.type == "route") {
         this.router.navigate(["edit", item.id], { relativeTo: this.route });
     } else {
@@ -138,7 +170,7 @@ export class PageListCoreComponent implements OnInit, OnDestroy {
     }
   }
   deleteItem(item: any) {
-    console.log("Delete Item From the page list component");
+    // console.log("Delete Item From the page list component");
     this.deleteItemDialog(item);
   }
   addItemDialog() {
@@ -155,7 +187,7 @@ export class PageListCoreComponent implements OnInit, OnDestroy {
     });
 
     this.ref.onClose.subscribe((response: any) => {
-      console.log(response);
+    //   console.log(response);
       if (response) {
         this.resetPage();
         this._getData.next();
@@ -179,7 +211,7 @@ export class PageListCoreComponent implements OnInit, OnDestroy {
     });
 
     this.ref.onClose.subscribe((response: any) => {
-      console.log(response);
+    //   console.log(response);
       if (response) {
         this.resetPage();
         this._getData.next();
@@ -237,7 +269,7 @@ export class PageListCoreComponent implements OnInit, OnDestroy {
       sort.order == 1
         ? ApiOrdersConditionsValue.ASEC
         : ApiOrdersConditionsValue.DESC;
-        console.log('page-list-core',sort);
+        // console.log('page-list-core',sort);
     if (!this.orders) {
         this.orders = {};
     }
@@ -251,7 +283,7 @@ export class PageListCoreComponent implements OnInit, OnDestroy {
   }
 
   pageChanged(event: any) {
-    console.log('page-list-core', event);
+    // console.log('page-list-core', event);
     if (
       event.first != this.pageConfig.tableConfig.first ||
       event.rows != this.pageConfig?.tableConfig?.pageSize
@@ -259,25 +291,25 @@ export class PageListCoreComponent implements OnInit, OnDestroy {
       this.pageConfig.tableConfig.first = event.first;
       this.pageConfig.tableConfig.pageSize = event.rows;
       this.pageIndex = event.page + 1;
-      console.log(event);
+    //   console.log(event);
       this._getData.next();
     } else {
-      console.log("No Change in Page");
+    //   console.log("No Change in Page");
     }
   }
   onFilter(event: any) {
-    console.log('page-list-core', event);
+    // console.log('page-list-core', event);
     // console.log(event);
     this.filters = event;
     this._getData.next();
   }
   resetFilter() {
-    console.log('page-list-core', "reset-filter");
+    // console.log('page-list-core', "reset-filter");
     this.filters = null;
     this._getData.next();
   }
   search(event: any) {
-    console.log('page-list-core', "search", event);
+    // console.log('page-list-core', "search", event);
     this.resetPage();
     this._getData.next();
   }
@@ -288,9 +320,13 @@ export class PageListCoreComponent implements OnInit, OnDestroy {
     this.pageConfig.tableConfig.pageSize = 10;
   }
   clearSearch() {
-    console.log('page-list-core', "search", event);
+    // console.log('page-list-core', "search", event);
     this.searchQ = "";
     this._getData.next();
   }
-  ngOnDestroy(): void {}
+  ngOnDestroy(): void {
+    if (this.pageConfig.onDestroy) {
+      this.pageConfig.onDestroy();
+    }
+  }
 }

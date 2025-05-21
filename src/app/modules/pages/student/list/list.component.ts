@@ -1,19 +1,20 @@
-import { Component,OnInit,ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Student } from '../../../../core/model/student.model';
 import { StudentService } from '../../../../core/service/student.service';
-import { faTrash, faUser,faPencil } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faUser, faPencil } from '@fortawesome/free-solid-svg-icons';
 import { DialogComponent } from '../dialog/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import * as XLSX from 'xlsx';
-import swal from 'sweetalert2'
+import swal from 'sweetalert2';
 import { HomeComponent } from '../home/home/home.component';
 import { DetailsComponent } from '../details/details.component';
 import { Gender } from '../../../../core/model/gender.enum';
 
+
 @Component({
   selector: 'app-list',
   templateUrl: './list.component.html',
-  styleUrl: './list.component.css'
+  styleUrl: './list.component.scss'
 })
 export class ListComponent implements OnInit{
 

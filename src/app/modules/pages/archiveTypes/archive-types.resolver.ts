@@ -398,7 +398,7 @@ export const ArchiveTypesResolver: ResolveFn<PageListOptions> = (
         route: 'archive-types',
         module: ModulesNames.FileWare,
         entity: EntitiesNames.archiveTypes,
-        // version: 'v1',
+        version: 'v1',
         filters: filters,
         headerOptions: headerOptions,
         formConfig: formConfig,

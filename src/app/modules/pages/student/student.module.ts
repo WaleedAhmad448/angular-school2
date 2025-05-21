@@ -10,6 +10,10 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { HomeComponent } from './home/home/home.component';
 import { DialogComponent } from './dialog/dialog.component';
 import { DetailsComponent } from './details/details.component';
+import { TableModule } from 'primeng/table';
+import { SharedModule } from 'src/app/shared/shared.module';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api/confirmationservice';
 
 @NgModule({
     declarations: [
@@ -23,9 +27,14 @@ import { DetailsComponent } from './details/details.component';
         StudentRoutingModule,
         FormsModule,
         FontAwesomeModule,
-        MatDialogModule
+        MatDialogModule,
+        TableModule,
+        // SharedModule,
+        ConfirmDialogModule,    
+        
     ],
     providers: [
+        ConfirmationService  
     ],
 })
 export class StudentModule {}

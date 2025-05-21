@@ -30,8 +30,14 @@
   </div>
 
   <div>
-    <kitsng-table-factory [tableConfig]="tableConfig"></kitsng-table-factory>
+    <kitsng-fetch-table-factory [tableConfig]="tableConfig">
+
+    </kitsng-fetch-table-factory>
   </div>
 </div>
 
 <p-toast></p-toast>
+
+<ng-template #ImageField let-value>
+  <img [src]="serverBaseUrl + value" alt="" class="w-2rem h-2rem border-round" />
+</ng-template>

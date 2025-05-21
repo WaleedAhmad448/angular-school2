@@ -33,13 +33,18 @@
                 </ng-container>
                 <ng-template #defaultTemplate>
                     <ng-container *ngFor="let item of pageHeaderOptions.actions">
-                        <div class="mx-1">
-                            <button pButton pRipple class="{{item.class}}"
-                            label="{{ item.label }}"
-                            icon="{{ item.icon }}"
-                            [iconPos]="item.iconPos ?? 'left'"
-                            (click)="item.onClick? item.onClick($event): false"></button>
-                        </div>
+                        <ng-container *ngIf="item.template;else actionDefaultTemp">
+                            <ng-container *ngTemplateOutlet="item.template;context: { $implicit: item, defaultTemplate:  actionDefaultTemp}"></ng-container>
+                        </ng-container>
+                        <ng-template #actionDefaultTemp>
+                            <div class="mx-1">
+                                <button pButton pRipple class="{{item.class}}"
+                                label="{{ item.label }}"
+                                icon="{{ item.icon }}"
+                                [iconPos]="item.iconPos ?? 'left'"
+                                (click)="item.onClick? item.onClick($event): false"></button>
+                            </div>
+                        </ng-template>
                     </ng-container>
                 </ng-template>
             </div>
@@ -47,7 +52,15 @@
     </div>
     <div class="flex align-items-center justify-content-between {{pageHeaderOptions.filterClass}}" *ngIf="pageHeaderOptions.filtersTemplate">
         <div class="flex flex-column gap-2 lg:flex-row lg:align-items-center">
-            <ng-container *ngIf="pageHeaderOptions.filtersTemplate"></ng-container>
+            <ng-container *ngIf="pageHeaderOptions.filtersTemplate">
+                <ng-container *ngTemplateOutlet="pageHeaderOptions.filtersTemplate"></ng-container>
+            </ng-container>
         </div>
+    </div>
+    <div class="" *ngIf="pageHeaderOptions.actionsForm && (pageHeaderOptions.actionsFormFields?.length || -1) > 0">
+        <kitsng-form-factory
+            [fields]="pageHeaderOptions.actionsFormFields"
+            [form]="pageHeaderOptions.actionsForm"
+            ></kitsng-form-factory>
     </div>
 </div>

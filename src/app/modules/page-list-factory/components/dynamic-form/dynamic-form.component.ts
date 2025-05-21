@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import {
   FormConfig,
   FormHeaderOptions,
@@ -22,6 +22,8 @@ import { cloneDeep } from "lodash";
   styles: [],
 })
 export class DynamicFormComponent implements OnInit, OnDestroy {
+  @ViewChild("formContainerRef", { static: false })
+  formContainerRef!: ElementRef;
   pageConfig!: PageListOptions;
   item!: any;
   formConfig!: FormConfig;
@@ -29,6 +31,7 @@ export class DynamicFormComponent implements OnInit, OnDestroy {
   fields: KitsngFormFactoryModel[] = [];
   form!: FormGroup;
   isSubmitted: boolean = false;
+  backUrl: string | undefined;
   constructor(
     // private pageListService: PageListService,
     private router: Router,
@@ -41,18 +44,25 @@ export class DynamicFormComponent implements OnInit, OnDestroy {
     // get data from route or parent route data
     this.route.data.subscribe((data) => {
       this.pageConfig = data["pageConfig"];
-      console.log(this.pageConfig);
+    //   console.log(this.pageConfig);
     });
+    this.backUrl = this.route.snapshot.queryParams["backUrl"];
   }
   initProperties() {
     this.formConfig = this.pageConfig.formConfig;
+    if (this.formConfig?.init) {
+        this.formConfig?.init();
+    }
     this.fields = this.formConfig.fields ?? [];
-    this.form = this.formFactory.createForm(this.fields);
-    this.headerOptions = this.formConfig.headerOptions;
+    if (!this.formConfig.reCreateFormOnGetData) {
+      this.form = this.formFactory.createForm(this.fields);
+    }
+    this.headerOptions =  cloneDeep(this.formConfig.headerOptions);
     this.apiService._initService(
       this.pageConfig.module,
       this.pageConfig.entity,
-      // this.pageConfig.version
+      this.pageConfig.version,
+      this.pageConfig.apiPath
     );
     this.getItem();
   }
@@ -62,6 +72,10 @@ export class DynamicFormComponent implements OnInit, OnDestroy {
   getItem() {
     this.route.paramMap.subscribe((params) => {
       const id = params.get("id");
+      const copyId = params.get("copyId");
+      if ((!id && !copyId) && !this.form) {
+        this.form = this.formFactory.createForm(this.fields);
+      }
       if (id) {
         if (this.headerOptions) {
           this.headerOptions.title =
@@ -77,17 +91,33 @@ export class DynamicFormComponent implements OnInit, OnDestroy {
             this.formConfig.headerOptions?.breadcrumbs ??
             [];
         }
-        this.apiService.getById(id).subscribe((data) => {
-          console.log(data);
-          this.item = cloneDeep(data);
-          let dataDto = this.item;
-          if (this.formConfig?.mapFromApi) {
-            dataDto = this.formConfig?.mapFromApi(this.item, this.fields);
-          }
-          this.form.patchValue(dataDto);
-          this.form.updateValueAndValidity();
-          console.log(this.form.value);
-        });
+        this.getDataById(id);
+      }
+      if (copyId) {
+        this.getDataById(copyId, "copy");
+      }
+    });
+  }
+  getDataById(id: string, type: "edit" | "copy" = "edit"){
+    this.apiService.getById(id).subscribe({
+      next: (data) => {
+        // console.log(data);
+        if (type == "edit") {
+            this.item = cloneDeep(data);
+        }
+        let dataDto = data;
+        if (this.formConfig?.mapFromApi) {
+          dataDto = this.formConfig?.mapFromApi(dataDto, this.fields);
+        }
+        if (this.formConfig.reCreateFormOnGetData) {
+          this.form = this.formFactory.createForm(this.fields);
+        }
+        this.form.patchValue(dataDto);
+        this.form.updateValueAndValidity();
+        // console.log(this.form.value);
+      },
+      error: (error)=>{
+        this.form = this.formFactory.createForm(this.fields);
       }
     });
   }
@@ -99,6 +129,7 @@ export class DynamicFormComponent implements OnInit, OnDestroy {
     this.form.markAllAsTouched();
     this.form.updateValueAndValidity();
     if (this.form.invalid) {
+        this.scrollToFirstError();
       return;
     }
     if (this.item) {
@@ -115,7 +146,7 @@ export class DynamicFormComponent implements OnInit, OnDestroy {
     if (this.formConfig?.addMapToApi) {
       data = this.formConfig?.addMapToApi(data);
     }
-    console.log(data);
+    // console.log(data);
     this.form.disable();
     this.apiService[
       this.formConfig?.saveDataType == "formData" ? "addForm" : "add"
@@ -139,12 +170,12 @@ export class DynamicFormComponent implements OnInit, OnDestroy {
       });
   }
   update() {
-    console.log(this.form.value);
+    // console.log(this.form.value);
     let data = this.form.value;
     if (this.formConfig?.editMapToApi) {
       data = this.formConfig?.editMapToApi(data, this.item);
     }
-    console.log(data);
+    // console.log(data);
     this.form.disable();
     this.apiService[
       this.formConfig?.updateDataType == "formData" ? "editForm" : "edit"
@@ -167,14 +198,25 @@ export class DynamicFormComponent implements OnInit, OnDestroy {
       });
   }
   back() {
-    if ((this.formConfig?.backUrl?.length ?? -1) > 0) {
-      this.router.navigate([...(this.formConfig?.backUrl ?? [])]);
-    } else {
-      if (this.item) {
-        this.router.navigate(["../../"], { relativeTo: this.route });
-      } else {
-        this.router.navigate(["../"], { relativeTo: this.route });
-      }
+    if (this.backUrl) {
+        this.router.navigateByUrl(this.backUrl);
+    }else{
+        if ((this.formConfig?.backUrl?.length ?? -1) > 0) {
+          this.router.navigate([...(this.formConfig?.backUrl ?? [])]);
+        } else {
+          if (this.item) {
+            this.router.navigate(["../../"], { relativeTo: this.route });
+          } else {
+            this.router.navigate(["../"], { relativeTo: this.route });
+          }
+        }
+    }
+  }
+  scrollToFirstError() {
+    const invalidElements =
+      this.formContainerRef?.nativeElement?.querySelectorAll(":not(form).ng-invalid");
+    if (invalidElements?.length > 0) {
+      invalidElements?.[0]?.scrollIntoView({ behavior: "smooth" });
     }
   }
   ngOnDestroy(): void {}

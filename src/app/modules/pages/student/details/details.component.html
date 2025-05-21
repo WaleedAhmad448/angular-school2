@@ -2,8 +2,9 @@
     <div class="border rounded-md p-5">
 
         <div class="flex justify-between">
-            <fa-icon [icon]="faArrowLeft" (click)="goTo()" class="text-xl"></fa-icon>
-            <fa-icon [icon]="pencil" class="text-blue-500 text-xl" (click) = "toggleDialog()"></fa-icon>
+          <i class="pi-arrow-left" (click)="goTo()" style="font-size: 1.5rem"></i>
+
+          <i class="pi-pencil" (click)="toggleDialog()" style="font-size: 1.5rem"></i>
         </div>
         
         <h2 class="text-center font-bold mb-4">{{ student.studentName }} Information</h2>

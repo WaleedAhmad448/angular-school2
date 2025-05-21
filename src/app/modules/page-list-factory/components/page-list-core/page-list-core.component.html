@@ -8,7 +8,7 @@
             <h4>{{pageConfig.tableHeaderOptions?.title}}</h4>
             <p>{{pageConfig.tableHeaderOptions?.description}}</p>
         </div>
-        <div class="flex gap-2" *ngIf="pageConfig.tableHeaderOptions?.showFilter || pageConfig.tableHeaderOptions?.showSearch">
+        <div class="flex align-items-center gap-2" *ngIf="pageConfig.tableHeaderOptions?.showFilter || pageConfig.tableHeaderOptions?.showSearch">
             <kitsng-filter
                 [fields]="this.pageConfig.filters ?? []"
                 (applay)="onFilter($event)"

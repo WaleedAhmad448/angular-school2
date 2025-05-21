@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { KitsngFormFactoryModel, KitsngFormFactoryService } from 'kitsng-form-factory';
 import { MessageService } from 'primeng/api';
@@ -15,6 +15,8 @@ import { ApiService } from 'src/app/core/service/api.service';
     ]
 })
 export class DynamicFormDialogComponent implements OnInit {
+    @ViewChild("formContainerRef", { static: false })
+    formContainerRef!: ElementRef;
   item!: any;
   formConfig!: FormConfig;
   pageConfig!: PageListOptions;
@@ -31,7 +33,7 @@ export class DynamicFormDialogComponent implements OnInit {
   ) {
   }
   ngOnInit(): void {
-    console.log(this.refConfig.data);
+    // console.log(this.refConfig.data);
     this.pageConfig = this.refConfig.data.pageConfig;
     this.formConfig = this.pageConfig.formConfig;
     if (this.formConfig?.init) {
@@ -43,9 +45,8 @@ export class DynamicFormDialogComponent implements OnInit {
       this.item = this.refConfig.data?.item;
       this.updateFormValue();
     }
-    this.apiService._initService(this.pageConfig.module, this.pageConfig.entity,
-      // this.pageConfig.version
-    );
+    this.apiService._initService(this.pageConfig.module,this.pageConfig.entity, this.pageConfig.version,
+        this.pageConfig.apiPath);
   }
   submit(event: any){
     if (this.formConfig?.beforeSubmit) {
@@ -55,6 +56,7 @@ export class DynamicFormDialogComponent implements OnInit {
     this.form.markAllAsTouched();
     this.form.updateValueAndValidity();
     if (this.form.invalid) {
+        this.scrollToFirstError();
       return;
     }
     if (this.item) {
@@ -71,7 +73,7 @@ export class DynamicFormDialogComponent implements OnInit {
     if (this.formConfig?.addMapToApi) {
         data = this.formConfig?.addMapToApi(data);
     }
-    console.log(data)
+    // console.log(data)
     this.form.disable();
     this.apiService[this.formConfig?.saveDataType == "formData"? "addForm" : "add"](data)
     .pipe(finalize(()=>this.form.enable()))
@@ -93,7 +95,7 @@ export class DynamicFormDialogComponent implements OnInit {
     if (this.formConfig?.editMapToApi) {
         data = this.formConfig?.editMapToApi(data, this.item);
     }
-    console.log(data);
+    // console.log(data);
     this.form.disable();
     this.apiService[this.formConfig?.updateDataType == "formData"? "editForm" : "edit"](data)
     .pipe(finalize(()=>this.form.enable()))
@@ -111,13 +113,20 @@ export class DynamicFormDialogComponent implements OnInit {
   }
   updateFormValue(){
       if (this.item) {
-        console.log(this.item);
+        // console.log(this.item);
         let data = this.item;
         if (this.formConfig?.mapFromApi) {
             data = this.formConfig?.mapFromApi(this.item, this.fields);
         }
         this.form.patchValue(data);
         this.form.updateValueAndValidity();
+    }
+  }
+  scrollToFirstError() {
+    const invalidElements =
+      this.formContainerRef?.nativeElement?.querySelectorAll(":not(form).ng-invalid");
+    if (invalidElements?.length > 0) {
+      invalidElements?.[0]?.scrollIntoView({ behavior: "smooth" });
     }
   }
 }

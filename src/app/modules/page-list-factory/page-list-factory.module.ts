@@ -15,6 +15,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { MessagesModule } from 'primeng/messages';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ApiService } from 'src/app/core/service/api.service';
 
 
 @NgModule({
@@ -38,6 +39,6 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     DynamicDialogModule,
     ConfirmDialogModule,
   ],
-  providers: [DialogService, ConfirmationService, MessageService]
+  providers: [DialogService, ConfirmationService, MessageService, ApiService]
 })
 export class PageListFactoryModule { }

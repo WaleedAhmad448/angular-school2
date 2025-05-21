@@ -32,6 +32,11 @@ import { KeyFilterModule } from 'primeng/keyfilter';
 import { RatingModule } from 'primeng/rating';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+import {ConfirmDialogModule} from 'primeng/confirmdialog';
+
 
 // others
 
@@ -71,8 +76,9 @@ import { TooltipModule } from 'primeng/tooltip';
     RatingModule,
     ToastModule,
     TooltipModule,
-
-
+    IconFieldModule,
+    InputIconModule,
+    ConfirmDialogModule,
   ],
   providers: [],
   exports: [
@@ -107,6 +113,11 @@ import { TooltipModule } from 'primeng/tooltip';
     RatingModule,
     ToastModule,
     TooltipModule,
+    IconFieldModule,
+    InputIconModule,
+    ConfirmDialogModule,
+    ConfirmDialog
+    
   ],
 
 })

@@ -4,6 +4,7 @@ import { KitsngFormFactoryModel } from "kitsng-form-factory";
 import { KitsngTableConfig } from "kitsng-table-factory";
 import { MenuItem } from "primeng/api";
 import { DynamicDialogConfig } from "primeng/dynamicdialog";
+import { OrderQuery, QueryFilters } from "src/app/core/model/http-response.model";
 
 export interface PageHeaderOptions {
   title: string;
@@ -12,6 +13,8 @@ export interface PageHeaderOptions {
   breadcrumbs?: MenuItem[];
   actions?: HeaderAction[];
   actionsTemplate?: TemplateRef<any>;
+  actionsForm?: FormGroup;
+  actionsFormFields?: KitsngFormFactoryModel[];
   status?: HeaderStatus[];
   statusTemplate?: TemplateRef<any>;
   filtersTemplate?: TemplateRef<any>;
@@ -28,6 +31,7 @@ export interface HeaderAction {
   onClick?(event: any): void;
   class?: string;
   isAdd?: boolean;
+  template?: TemplateRef<any>;
 }
 
 export interface HeaderStatus {
@@ -43,6 +47,7 @@ export interface FiltersOptions {
   module?: string;
   entity?: string;
   version?: string;
+  apiBaseUrl?: string;
 }
 
 export interface PageListOptions<T = any> {
@@ -50,9 +55,12 @@ export interface PageListOptions<T = any> {
   route: string;
   module: string;
   entity: string;
-  // version: string;
+  version: string;
+  apiPath?: string;
   headerOptions: PageHeaderOptions;
   tableConfig: KitsngTableConfig;
+  mainFilters?: QueryFilters;
+  mainOrders?: OrderQuery;
   formConfig: FormConfig<T>;
   filters?: FiltersOptions[];
   tableHeaderOptions?: TableHeaderOptions;
@@ -98,4 +106,5 @@ export interface FormConfig<T = any> {
   afterSave?(response: any, form?: FormGroup): void;
   afterUpdate?(response: any, form?: FormGroup): void;
   backUrl?: any[];
+  reCreateFormOnGetData?: boolean;
 }

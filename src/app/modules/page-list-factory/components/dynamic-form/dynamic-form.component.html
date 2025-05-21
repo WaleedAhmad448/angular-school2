@@ -2,7 +2,7 @@
 *ngIf="headerOptions"
 [pageHeaderOptions]="headerOptions"
 ></app-page-header>
-<div class="{{pageConfig.formConfig.continarClass ?? 'card border-round-2xl'}}">
+<div class="{{pageConfig.formConfig.continarClass ?? 'card border-round-2xl'}}" #formContainerRef *ngIf="form">
     <kitsng-form-factory
     [fields]="fields"
     [form]="form"

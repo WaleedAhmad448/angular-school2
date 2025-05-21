@@ -1,6 +1,7 @@
-import { Component, Input, Output } from '@angular/core';
+import { Component, Input, OnInit, Output } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { PageHeaderOptions } from '../../core/page-list.model';
+import { KitsngFormFactoryService } from 'kitsng-form-factory';
 
 @Component({
   selector: 'app-page-header',
@@ -8,11 +9,18 @@ import { PageHeaderOptions } from '../../core/page-list.model';
   styles: [
   ]
 })
-export class PageHeaderComponent {
+export class PageHeaderComponent implements OnInit {
     home!: MenuItem;
     @Input() pageHeaderOptions!: PageHeaderOptions;
-    constructor() {
+    constructor(
+        private formFactory: KitsngFormFactoryService
+    ) {
       this.home = { icon: "pi pi-th-large", routerLink: "/" };
+    }
+    ngOnInit(): void {
+        if (this.pageHeaderOptions.actionsFormFields && this.pageHeaderOptions.actionsFormFields.length) {
+            this.pageHeaderOptions.actionsForm = this.formFactory.createForm(this.pageHeaderOptions.actionsFormFields);
+        }
     }
 
 }

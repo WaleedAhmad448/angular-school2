@@ -11,6 +11,7 @@ import { StudentService } from 'src/app/core/service/student.service';
 import { ErrorHandlerService } from 'src/app/core/service/error-handler.service';
 import * as XLSX from 'xlsx';
 import swal from 'sweetalert2';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-student-list',
@@ -23,12 +24,12 @@ import swal from 'sweetalert2';
 export class StudentListComponent implements OnInit {
   studentService = inject(StudentService);
   router = inject(Router);
-
+  @ViewChild('ImageField', { static: true }) imageTemplate!: TemplateRef<any>; 
   @ViewChild('importFileInput') importFileInput!: ElementRef;
 
   students: Student[] = [];
   query: string = '';
-
+  serverBaseUrl: string = environment.baseUrl;
   _getData: Subject<void> = new Subject();
   getData$: Observable<void> = this._getData.asObservable();
 
@@ -41,14 +42,14 @@ export class StudentListComponent implements OnInit {
     private messageService: MessageService
   ) {
     this.initHeaderOptions();
-    this.initTableConfig();
   }
-
+  
   ngOnInit(): void {
-    this._getData.pipe(debounceTime(500)).subscribe(() => {
-      this.fetchStudentsData();
-    });
-    this._getData.next();
+    this.initTableConfig();
+    // this._getData.pipe(debounceTime(500)).subscribe(() => {
+    //   this.fetchStudentsData();
+    // });
+    // this._getData.next();
   }
 
   ngOnDestroy(): void {
@@ -187,11 +188,11 @@ initTableConfig() {
       {
         field: 'photo',
         header: 'Photo',
-        template: this.photoTemplate,
+        template: this.imageTemplate,
       },
 
     ],
-    data: this.students,
+    data: [],
     rowHover: true,
     pageSize: 10,
     first: 0,
@@ -228,6 +229,14 @@ initTableConfig() {
         colorClass: 'p-button-danger',
       },
     ],
+    fetchApiInfo:{
+      module: 'student',
+      entity: 'get',
+      path: 'all',
+      version: '',
+      baseUri: this.serverBaseUrl,
+      _getData: new Subject<void>(),
+    },
     onSelectedItems: (e) => {
       console.log('Selected students', e);
     },

@@ -15,7 +15,11 @@ const routes: Routes = [
     {
         path: 'edit/:id',
         component: DynamicFormComponent
-    }
+    },
+    {
+        path: 'copy/:copyId',
+        component: DynamicFormComponent
+    },
 ];
 
 @NgModule({
