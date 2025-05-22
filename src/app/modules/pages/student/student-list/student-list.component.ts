@@ -171,6 +171,7 @@ initTableConfig() {
     columns: [
       { field: 'studentId', header: 'ID' },
       { field: 'studentName', header: 'Name' },
+      { field: 'dateOfBirth', header: 'Date Birth' },
       { field: 'studentNrc', header: 'NRC No' },
       { field: 'age', header: 'Age' },
       { field: 'gender', header: 'Gender' },
