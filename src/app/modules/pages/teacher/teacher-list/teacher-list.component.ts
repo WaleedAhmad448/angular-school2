@@ -1,14 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { KitsngTableConfig, KitsngTableFactoryModule } from 'kitsng-table-factory';
 import { MessageService } from 'primeng/api';
 import { debounceTime, Observable, Subject } from 'rxjs';
+import { ApiQueryDto, ContextService } from 'saned-shared-lib';
 import { PageHeadeingOptions, PageHeading } from 'src/app/common/page-heading/page-heading.component';
-import { SharedModule } from 'src/app/shared/shared.module';
-import { Teacher } from 'src/app/core/model/teachers.model';
-import { TeacherService } from 'src/app/core/service/teachers.service';
+import { EntitiesNames, ModulesNames } from 'src/app/core/model/enums.model';
+import { ApiService } from 'src/app/core/service/api.service';import { SharedModule } from 'src/app/shared/shared.module';
+import { TeacherService } from 'src/app/core/service/teacher.service';
 import { ErrorHandlerService } from 'src/app/core/service/error-handler.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-teacher-list',
@@ -19,10 +21,13 @@ import { ErrorHandlerService } from 'src/app/core/service/error-handler.service'
   providers: [MessageService],
 })
 export class TeacherListComponent implements OnInit {
+  ctxService = inject(ContextService);
+  apiService : ApiService = inject(ApiService);
+  @ViewChild('ImageField', { static: true }) imageTemplate!: TemplateRef<any>; 
   teacherService = inject(TeacherService);
   router = inject(Router);
-
-  teachers: Teacher[] = [];
+  
+  serverBaseUrl: string = environment.apiBaseUrl;
   query: string = '';
 
   _getData: Subject<void> = new Subject();
@@ -37,37 +42,36 @@ export class TeacherListComponent implements OnInit {
   ) {
     this.initHeaderOptions();
     this.initTableConfig();
+    this.fetchTeacherData();
   }
 
   ngOnInit(): void {
-    this._getData.pipe(debounceTime(500)).subscribe(() => {
-      this.fetchTeachersData();
-    });
+  
     this._getData.next();
   }
 
   ngOnDestroy(): void {
     this._getData.unsubscribe();
   }
-  fetchTeachersData() {
-    this.teacherService.getAllTeacher().subscribe({
-      next: (response: Teacher[]) => {
-        if (this.query) {
-          const q = this.query.toLowerCase();
-          this.tableConfig.data = response.filter(teacher =>
-            teacher.fullName.toLowerCase().includes(q) ||
-              teacher.teacherNumber.toString().includes(q) ||
-                teacher.email.toLowerCase().includes(q)
-          );
-        } else {
-          this.tableConfig.data = response;
-        }
-      },
-      error: (error) => {
-        this.errorHandlerService.handleError(error, this.messageService);
+  fetchTeacherData() {
+  this.apiService._initService(ModulesNames.school, EntitiesNames.teacher,'v1');
+   this.getData$.pipe(debounceTime(500)).subscribe(() => {
+    const query: ApiQueryDto | any = {};
+      if (this.query != null || this.query != undefined) {
+        query['search'] = this.query;
       }
-    });
-  }
+      this.apiService.getPaged(query).subscribe({
+        next: (response : any) => {
+          console.log('TeacherData',response)
+          this.tableConfig.data = response.items;
+        },
+        error: (error) =>{
+          console.log('Error Fetching Teacher Data', error);
+          this.errorHandlerService.handleError(error,this.messageService);
+        } 
+      }) 
+  });
+}
   
 
   clearSearch() {
@@ -102,15 +106,15 @@ export class TeacherListComponent implements OnInit {
     this.tableConfig = {
       columns: [
         { field: 'fullName', header: 'Full Name' },
-        { field: 'dateOfBirth', header: 'Date of Birth' },
-        { field: 'teacherNumber', header: 'Teacher Number' },
-        { field: 'address', header: 'Address' },
-        { field: 'phoneNumber', header: 'Phone' },
         { field: 'email', header: 'Email' },
-        { field: 'subject', header: 'Subject' },
-        { field: 'qualification', header: 'Qualification' },
-        { field: 'hireDate', header: 'Hire Date' },
-        { field: 'profileImagePath', header: 'Profile Image' },
+        { field: 'address', header: 'Address' },
+        { field: 'phone', header: 'Phone' },
+        { field: 'dateOfBirth', header: 'Date of Birth' },
+        {
+          field: 'photo',
+          header: 'Photo',
+          template: this.imageTemplate,
+        },
       ],
       data: [],
       pageSize: 10,
@@ -121,32 +125,20 @@ export class TeacherListComponent implements OnInit {
       actionButtons: [
         {
           icon: 'pi pi-pencil',
-          onClick: (teacher: Teacher) => {
-              this.router.navigate([ 'teacher','edit', teacher.id]);
+             onClick: (e) => {
+                console.log(e);
+              this.router.navigate([ 'teacher','edit']);
           },
           colorClass: 'p-button-info',
         },
-         {
-                  icon: 'pi pi-trash',
-                  onClick: (teacher: Teacher) => {
-                    if (confirm(`Are you sure you want to delete ${teacher.fullName}?`)) {
-                      this.teacherService.deleteTeacher(teacher.id).subscribe({
-                        next: () => {
-                          this.messageService.add({
-                            severity: 'success',
-                            summary: 'Deleted',
-                            detail: `Teacher ${teacher.fullName} deleted successfully.`,
-                          });
-                          this._getData.next();
-                        },
-                        error: (error) => {
-                          this.errorHandlerService.handleError(error, this.messageService);
-                        }
-                      });
-                    }
-                  },
-                  colorClass: 'p-button-danger',
-                }
+        {
+          icon: 'pi pi-trash',
+          onClick: (e) => {
+            console.log(e);
+            this.router.navigate(['teacher', 'delete']);
+          },
+          colorClass: 'p-button-danger',
+        }
       ],
       onSelectedItems: (e) => {
         console.log('Selected teachers', e);

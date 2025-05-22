@@ -73,7 +73,7 @@ export const DocTypesResolver: ResolveFn<PageListOptions> = (route, state) => {
                     console.log(event);
                 },
                 filter: true,
-                module: ModulesNames.FileWare,
+                module: ModulesNames.school,
                 entity: EntitiesNames.docTypeAges,
                 version: 'v1',
                 apiBaseUrl: getBaseUrl(),
@@ -244,7 +244,7 @@ export const DocTypesResolver: ResolveFn<PageListOptions> = (route, state) => {
     let pageConfig: PageListOptions = {
         id: 'docTypes',
         route: 'docTypes',
-        module: ModulesNames.FileWare,
+        module: ModulesNames.school,
         entity: EntitiesNames.docTypes,
         version: 'v1',
         filters: filters,

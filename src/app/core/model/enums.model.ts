@@ -1,6 +1,6 @@
 export enum ModulesNames {
     FileWare = 'KitsysFileware',
-    School = 'school',
+    school = 'school',
     Test = 'test',
     
 }
@@ -11,4 +11,6 @@ export enum EntitiesNames {
     docTypeAges = 'DocTypeAges',
     archiveTypes = 'ArchiveTypes',
     studentRegistration= 'StudentRegistration',
+    teacher = 'teacher',
+    student = 'student',
 }

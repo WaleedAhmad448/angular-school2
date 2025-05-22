@@ -113,7 +113,7 @@ export class ApiService<T = any> {
   }
   getPaged(query: ApiQueryDto): Observable<ApiListDto<T>> {
     return this._httpClient
-      .post<ApiResponseDto<ApiListDto<T>>>(`${this.baseUrl}/page`, query)
+      .post<ApiResponseDto<ApiListDto<T>>>(`${this.baseUrl}`, query)
       .pipe(
         map((response) => {
           console.log(response);

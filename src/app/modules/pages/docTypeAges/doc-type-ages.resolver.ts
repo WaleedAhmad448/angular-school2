@@ -177,7 +177,7 @@ export const DocTypeAgesResolver: ResolveFn<PageListOptions> = (
     let pageConfig: PageListOptions = {
         id: 'docTypeAges',
         route: 'doc-type-ages',
-        module: ModulesNames.FileWare,
+        module: ModulesNames.school,
         entity: EntitiesNames.docTypeAges,
         version: 'v1',
         filters: filters,

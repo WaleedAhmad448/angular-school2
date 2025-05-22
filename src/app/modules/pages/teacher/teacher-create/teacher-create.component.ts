@@ -1,19 +1,23 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   KitsngFormFactoryModel,
   KitsngFormFactoryModule,
   KitsngFormFactoryService,
+  KitsngFormGroupFactoryModel,
 } from 'kitsng-form-factory';
 import { MessageService } from 'primeng/api';
+import { finalize, Observable, Subject } from 'rxjs';
 import {
   PageHeadeingOptions,
   PageHeading,
 } from 'src/app/common/page-heading/page-heading.component';
+import { EntitiesNames, ModulesNames } from 'src/app/core/model/enums.model';
+import { ApiService } from 'src/app/core/service/api.service';
 import { ErrorHandlerService } from 'src/app/core/service/error-handler.service';
-import { TeacherService } from 'src/app/core/service/teachers.service';
+import { TeacherService } from 'src/app/core/service/teacher.service';
 import { SharedModule } from 'src/app/shared/shared.module';
 
 @Component({
@@ -25,30 +29,34 @@ import { SharedModule } from 'src/app/shared/shared.module';
   styleUrl: './teacher-create.component.scss',
 })
 export class TeacherCreateComponent {
-  @ViewChild('formContainerRef', { static: false })
-  formContainerRef!: ElementRef;
+   @ViewChild("formContainerRef", { static: false })
+      formContainerRef!: ElementRef;
+    
+    apiService : ApiService = inject(ApiService);
+    router: Router= inject(Router);
+    activeRoute: ActivatedRoute = inject(ActivatedRoute);
 
-  router: Router = inject(Router);
-  activeRoute: ActivatedRoute = inject(ActivatedRoute);
+    pageUrl : "edit" | "add" | null = null;
+    _arrayFormLength : number = 0;
 
-  pageUrl: 'edit' | 'add' | null = null;
-  _arrayFormLength: number = 0;
-  teacherId!: number;
-
-  form!: FormGroup;
-  formFields: KitsngFormFactoryModel[] = [];
-  headerOptions!: PageHeadeingOptions;
-  constructor(
-    public formFactory: KitsngFormFactoryService,
-    private teacherService: TeacherService,
-    private errorHandlerService: ErrorHandlerService,
-    private messageService: MessageService
-  ) {
-    this.checkPageUrl();
-    this.initHeaderOptions();
-  }
-
-  checkPageUrl() {
+    teatherId!: number;
+    teacherData: any;
+    @ViewChild('ImageField', { static: true }) imageTemplate!: TemplateRef<any>;
+    @ViewChild('importFileInput') importFileInput!: ElementRef;
+    serverBaseUrl: string = 'http://localhost:8080';
+    query: string = '';
+    _getData: Subject<void> = new Subject();
+    getData$: Observable<void> = this._getData.asObservable();
+    
+    form!: FormGroup;
+    formFields: KitsngFormFactoryModel[] = [];
+    headerOptions!: PageHeadeingOptions;
+    constructor(public formFactory: KitsngFormFactoryService,private teacherService : TeacherService,
+        private errorHandlerService: ErrorHandlerService, private messageService: MessageService) {
+        this.checkPageUrl();
+       
+    }
+    checkPageUrl() {
     this.activeRoute.url.subscribe({
       next: (value) => {
         const urlPath = value.map((url) => url.path)[0];
@@ -56,7 +64,7 @@ export class TeacherCreateComponent {
           case 'edit':
             this.pageUrl = 'edit';
             this.activeRoute.params.subscribe((params) => {
-              this.teacherId = +params['id'];
+              this.teatherId = +params['id'];
               this.fetchTeacherData(); // 🟢 Load data for editing
             });
             break;
@@ -67,12 +75,12 @@ export class TeacherCreateComponent {
           default:
             this.pageUrl = null;
         }
+            this.initHeaderOptions();
       },
     });
   }
-
-  fetchTeacherData() {
-    this.teacherService.getTeacherById(this.teacherId).subscribe({
+      fetchTeacherData() {
+    this.teacherService.getAll().subscribe({
       next: (teacher) => {
         this.initForm();
         this.mapFromApi(teacher);
@@ -82,260 +90,196 @@ export class TeacherCreateComponent {
       },
     });
   }
-
-  submit() {
-    this.form.markAllAsTouched();
-    this.form.updateValueAndValidity();
-    if (this.form.invalid) {
-      this.scrollToFirstError();
-    } else {
-      if (this.pageUrl === 'edit') {
-        this.update();
-      } else {
-        this.create();
-      }
+    submit(){
+        this.form.markAllAsTouched();
+        this.form.updateValueAndValidity();
+      if(this.form.invalid){
+        this.scrollToFirstError();
+       }else{
+        if(this.pageUrl == 'edit'){
+            this.update();
+        }else{
+            this.create();
+        }
+       }
     }
-  }
-// create() {
-//   const formData = new FormData();
-//   const rawData = this.form.value;
-//   const imageFile = rawData.profileImagePath; // هذا هو كائن الصورة
-//   if (imageFile && imageFile instanceof File) {
-//     formData.append('file', imageFile);
-//     // 1. رفع الصورة أولاً
-//     this.teacherService.uploadTeacherImage(formData).subscribe({
-//       next: (uploadRes) => {
-//         // 2. استخدم مسار الصورة بعد رفعها
-//         const request = this.addMapToApi({
-//           ...rawData,
-//           profileImagePath: uploadRes.imagePath // مثلا: "uploads/teachers/img123.jpg"
-//         });
+    create(){
+        const data = this.addMapToApi(this.form.getRawValue());
+        console.log(data)
+        this.apiService._initService(ModulesNames.school, EntitiesNames.teacher,'v1');
+        this.form.disable()
+         this.apiService.add(data).pipe(finalize(() => this.form.enable())).subscribe({
+            next: (response) => {
+                console.log('Data',response);
+                this.messageService.add({ severity: 'info', summary: 'Confirmed', detail: 'Your data have been added successfully' });
+                this.router.navigate(['student','add'])
+            },
+            error:(error) =>{
+                this.form.enable()
+                console.log('Error Fetching Data',error);
+                this.errorHandlerService.handleError(error,this.messageService);
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: `Error Add Data`,
+                });
+            }
+         });
+    }
+    update(){
+        const data = this.editMapToApi(this.form.getRawValue());
+        console.log(data)
+        this.apiService._initService(ModulesNames.school, EntitiesNames.teacher,'v1');
+        this.form.disable()
+         this.apiService.edit(data).pipe(finalize(() => this.form.enable())).subscribe({
+            next: (response) => {
+                console.log('Data',response);
+                this.messageService.add({ severity: 'info', summary: 'Confirmed', detail: 'Your data have been updated successfully' });
+                this.router.navigate(['teacher','edit',response.id])
+            },
+            error:(error) =>{
+                this.form.enable()
+                console.log('Error Update Data',error);
+                this.errorHandlerService.handleError(error,this.messageService);
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: `Error Update Data`,
+                });
+            }
+         });
+    }
+    editMapToApi(data: any){
+        delete data['periodTotal'];
+        // data['id'] = this.financialPeriodData.yearId;
+        return data;
+    }
+    addMapToApi(data: any){
+     delete data['periodTotal'];
+     data['endDate'] = data['endDate'] ? new Date(data['endDate']).toISOString() : '';
+     data['periods']= data['periods'].map((item: any) =>{
+        return {
+            ...item,
+            startDate: item.startDate ? new Date(item.startDate).toISOString() : '',
+            // code: "Azaam"
+        }
+     })
+     return data;
+    }
+    mapFromApi(data : any){
+       data['periodTotal'] = this._arrayFormLength;
+       data['periods'] = data['periods'].map((item:any)=>{
+        return{
+            ...item,
+            id: item.id,
+            startDate: item.startDate ? new Date(item.startDate) : null,
 
-//         // 3. إرسال الطلب لإنشاء المدرّس
-//         this.teacherService.registerTeacher(request).subscribe({
-//           next: () => {
-//             this.messageService.add({
-//               severity: 'success',
-//               summary: 'Success',
-//               detail: 'Teacher created successfully',
-//             });
-//             this.router.navigate(['teacher']);
-//           },
-//           error: (error) => {
-//             this.errorHandlerService.handleError(error, this.messageService);
-//           }
-//         });
-//       },
-//       error: (uploadError) => {
-//         this.errorHandlerService.handleError(uploadError, this.messageService);
-//       }
-//     });
-//   } else {
-//     this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Profile image is required.' });
-//   }
-// }
+        }
+       })
+        return data;
+       }
+    scrollToFirstError() {
+        const invalidElements =
+          this.formContainerRef?.nativeElement?.querySelectorAll(":not(form).ng-invalid");
+        if (invalidElements?.length > 0) {
+          invalidElements?.[0]?.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+      back(){
+        window.history.back()
+      }
+    initHeaderOptions() {
+        let self = this;
 
-  create() {
-    const request = this.addMapToApi(this.form.value);
-    this.teacherService.registerTeacher(request).subscribe({
-      next: () => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Teacher created successfully',
-        });
-        this.router.navigate(['teacher']);
-      },
-      error: (error) => {
-        this.errorHandlerService.handleError(error, this.messageService);
-      },
-    });
-  }
-
-  update() {
-    const request = this.editMapToApi(this.form.value);
-    this.teacherService
-      .updateTeacher(this.form.value.id, request)
-      .subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'teacher updated successfully',
-          });
-          this.router.navigate(['teacher']);
-        },
-        error: (error) => {
-          this.errorHandlerService.handleError(error, this.messageService);
-        },
-      });
-  }
-
-  addMapToApi(data: any) {
-    return {
-        ...data,
-        dateOfBirth: new Date(data.dateOfBirth).toISOString(), // ✅ التحويل الصحيح
-        createdAt: new Date().toISOString()
+        this.headerOptions = {
+            title:this.pageUrl == 'edit' ? 'Update Financial Period' : 'Create New Financial Period',
+            description: 'fill all required fields',
+            containerClass: 'card mb-3 pb-3',
+            breadcrumbs: [
+                {
+                  label: "Financial Periods",
+                  routerLink: "/finance/financial-periods"
+                },
+                {
+                    label: this.pageUrl=='edit' ? 'Update Financial Period' :'Create New Financial Period',
+                },
+            ],
+            actions: [],
         };
     }
-
-
-  editMapToApi(data: any) {
-    return {
-      ...data,
-      updatedAt: new Date().toISOString(),
-    };
-  }
-
-  mapFromApi(data: any) {
-    this.form.patchValue({
-      id: data.id,
-      fullName: data.fullName,
-      dateOfBirth: new Date(data.dateOfBirth), // ✅ مهم لتحويل التاريخ
-      teacherNumber: data.teacherNumber,
-      address: data.address,
-      phoneNumber: data.phoneNumber,
-      email: data.email,
-      gradeLevel: data.gradeLevel,
-      parentName: data.parentName,
-      parentPhoneNumber: data.parentPhoneNumber,
-    });
-  }
-
-  scrollToFirstError() {
-    const invalidElements = this.formContainerRef?.nativeElement?.querySelectorAll(
-      ':not(form).ng-invalid'
-    );
-    if (invalidElements?.length > 0) {
-      invalidElements?.[0]?.scrollIntoView({ behavior: 'smooth' });
-    }
-  }
-
-  back() {
-    window.history.back();
-  }
-
-  initHeaderOptions() {
-    this.headerOptions = {
-      title:
-        this.pageUrl === 'edit' ? 'Update teacher' : 'Create New teacher',
-      description: 'Fill all required fields',
-      containerClass: 'card mb-3 pb-3',
-      breadcrumbs: [
-        {
-          label: 'teacher',
-          routerLink: '/teacher',
-        },
-        {
-          label:
-            this.pageUrl === 'edit'
-              ? 'Update teacher'
-              : 'Create New teacher',
-        },
-      ],
-      actions: [],
-    };
-  }
-
-  initForm() {
-    this.formFields = [
-      {
-        controlType: 'input',
-        colSize: 'col-12 md:col-6',
-        options: {
-          label: 'Full Name',
-          formControlName: 'fullName',
-          validators: { required: true },
-        },
-      },
-      {
-        controlType: 'calendar-picker',
-        colSize: 'col-12 md:col-6',
-        options: {
-          label: 'Date of Birth',
-          formControlName: 'dateOfBirth',
-          validators: { required: true },
-        },
-      },
-          {
-        controlType: 'input',
-        colSize: 'col-12 md:col-6',
-        options: {
-          label: 'Teacher Number',
-          formControlName: 'teacherNumber',
-        },
-      },
+    initForm() {
+        this.formFields = [
             {
-        controlType: 'input',
-        colSize: 'col-12 md:col-6',
-        options: {
-          label: 'Address',
-          formControlName: 'address',
-          validators: { required: true },
-        },
-      },
-      {
-        controlType: 'input',
-        colSize: 'col-12 md:col-6',
-        options: {
-          label: 'Phone Number',
-          formControlName: 'phoneNumber',
-          validators: { required: true },
-        },
-      },
-      {
-        controlType: 'input',
-        colSize: 'col-12 md:col-6',
-        options: {
-          label: 'Email',
-          formControlName: 'email',
-          validators: { required: true },
-        },
-      },
+                colSize: 'col-12 md:col-6',
+                controlType: 'dropdown',
+                options: {
+                    label: 'Period Type',
+                    formControlName: 'periodType',
+                    validators: { required: true },
+                    placeholder: 'Select Type',
+                    containerClass: 'align-items-center pl-4 sm:pl-6',
+                    controlLayout: 'horizontal',
+                    labelColSize: 'col-4',
+                    controlColSize: 'col-8',
+                },
+            },
 
-      {
-        controlType: 'input',
-        colSize: 'col-12 md:col-6',
-        options: {
-          label: 'Subject',
-          formControlName: 'subject',
-          validators: { required: true },
-        },
-      },
-      {
-        controlType: 'input',
-        colSize: 'col-12 md:col-6',
-        options: {
-          label: 'Qualification',
-          formControlName: 'qualification',
-        },
-      },
-     {
-        controlType: 'calendar-picker',
-        colSize: 'col-12 md:col-6',
-        options: {
-          label: 'Hire Date',
-          formControlName: 'hireDate',
-          validators: { required: true },
-        },
-      },
-      {
-        controlType: 'file-upload',
-        colSize: 'col-12 md:col-6',
-        options: {
-          label: 'Profile Image',
-          formControlName: 'profileImagePath',
-          validators: { required: true },
-          multiple: false,
-          accept: 'image/*',
-        },    
-      },
-    ];
-
-    this.form = this.formFactory.createForm(this.formFields);
-    // إضافة id بشكل يدوي إذا لم يكن موجود
-    if (!this.form.contains('id')) {
-      this.form.addControl('id', new FormControl(null));
+            {
+                colSize: 'col-12 md:col-6',
+                controlType: 'lookup-select',
+                options: {
+                    label: 'Year',
+                    formControlName: 'yearId',
+                    validators: { required: true },
+                    placeholder: 'Select Year',
+                    containerClass: 'align-items-center pl-4 sm:pl-6',
+                    controlLayout: 'horizontal',
+                    labelColSize: 'col-4',
+                    controlColSize: 'col-8',
+                    
+                },
+            },
+            {
+                controlType: 'calendar-picker',
+                colSize: 'col-12 md:col-6',
+                options: {
+                    label: 'End Date',
+                    formControlName: 'endDate',
+                    placeholder:'mm/dd/yyyy',
+                    disabled: true,
+                    containerClass: 'align-items-center pl-4 sm:pl-6',
+                    controlLayout: 'horizontal',
+                    labelColSize: 'col-4',
+                    controlColSize: 'col-8',
+                },
+            },
+            {
+                controlType: 'input-number',
+                colSize: 'col-12 md:col-6',
+                options: {
+                    label: 'Periods Total',
+                    formControlName: 'periodTotal',
+                    readonly: true,
+                    containerClass: 'align-items-center pl-4 sm:pl-6',
+                    controlLayout: 'horizontal',
+                    labelColSize: 'col-4',
+                    controlColSize: 'col-8',
+                },
+            },
+            {
+                controlType: 'input',
+                colSize: 'col-12',
+                options: {
+                    label: 'Periods',
+                    formControlName: 'periods',
+                    formControlType: 'array',
+                    arrayLayout: 'table',
+                    
+                },
+            },
+        ];
+        this.form = this.formFactory.createForm(this.formFields);
     }
-  }
+    
 }
+

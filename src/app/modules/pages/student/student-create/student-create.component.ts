@@ -13,7 +13,7 @@ import {
   PageHeading,
 } from 'src/app/common/page-heading/page-heading.component';
 import { ErrorHandlerService } from 'src/app/core/service/error-handler.service';
-import { StudentService } from 'src/app/core/service/students.service';
+import { StudentService } from 'src/app/core/service/student.service';
 import { SharedModule } from 'src/app/shared/shared.module';
 
 @Component({
@@ -45,7 +45,6 @@ export class StudentCreateComponent {
     private messageService: MessageService
   ) {
     this.checkPageUrl();
-    this.initHeaderOptions();
   }
 
   checkPageUrl() {
@@ -67,6 +66,7 @@ export class StudentCreateComponent {
           default:
             this.pageUrl = null;
         }
+            this.initHeaderOptions();
       },
     });
   }
@@ -98,19 +98,21 @@ export class StudentCreateComponent {
   }
 
   create() {
-    const request = this.addMapToApi(this.form.value);
-    this.studentService.registerStudent(request).subscribe({
+    const formValue = this.form.value;
+    const photoFile = this.form.get('photo')?.value;
+    
+    this.studentService.createStudent(formValue, photoFile).subscribe({
       next: () => {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Student created successfully',
+          detail: 'Student created successfully'
         });
         this.router.navigate(['student']);
       },
       error: (error) => {
         this.errorHandlerService.handleError(error, this.messageService);
-      },
+      }
     });
   }
 
@@ -141,7 +143,6 @@ export class StudentCreateComponent {
         };
     }
 
-
   editMapToApi(data: any) {
     return {
       ...data,
@@ -153,15 +154,16 @@ export class StudentCreateComponent {
   mapFromApi(data: any) {
     this.form.patchValue({
       id: data.id,
-      fullName: data.fullName,
+      studentName: data.studentName,
+      studentNrc: data.studentNrc,
+      age: data.age,
       dateOfBirth: new Date(data.dateOfBirth), // ✅ مهم لتحويل التاريخ
-      studentNumber: data.studentNumber,
+      fatherName: data.fatherName,
+      gender: data.gender,
+      township: data.township,
       address: data.address,
-      phoneNumber: data.phoneNumber,
-      email: data.email,
-      gradeLevel: data.gradeLevel,
-      parentName: data.parentName,
-      parentPhoneNumber: data.parentPhoneNumber,
+      date: new Date(data.date),
+      photo: data.photo,
     });
   }
 
@@ -202,84 +204,141 @@ export class StudentCreateComponent {
 
   initForm() {
     this.formFields = [
+  
       {
         controlType: 'input',
         colSize: 'col-12 md:col-6',
         options: {
-          label: 'Full Name',
-          formControlName: 'fullName',
+          label: 'Name',
+          formControlName: 'studentName',
+          validators: { required: true },
+        },
+      },  
+      {
+        controlType: 'input',
+        colSize: 'col-12 md:col-6',
+        options: {
+          label: 'NRC No',
+          formControlName: 'studentNrc',
+          validators: { required: true },
+        },
+      }, 
+      {
+        controlType: 'input',
+        colSize: 'col-12 md:col-6',
+        options: {
+          label: 'Age',
+          formControlName: 'age',
           validators: { required: true },
         },
       },
       {
         controlType: 'calendar-picker',
         colSize: 'col-12 md:col-6',
+        id: 'dateOfBirth',
         options: {
           label: 'Date of Birth',
           formControlName: 'dateOfBirth',
+          dateFormat: 'yy-mm-dd',
+          placeholder: 'select date',
+          validators: {
+            required: true
+          }
+        }
+      },
+
+      {
+        controlType: 'input',
+        colSize: 'col-12 md:col-6',
+        options: {
+          label: 'Father Name',
+          formControlName: 'fatherName',
           validators: { required: true },
+        },
+      },
+
+      {
+        controlType: "dropdown",
+        colSize: "col-12 md:col-6",
+        options: {
+          label: "Gender",
+          id: 1,
+          formControlName: "gender",
+          ngModelChange: (e) => {
+            console.log(e);
+          },
+          // controlLayout: "horizontal",
+          validators: {
+            required: true,
+          },
+          placeholder: "Select Gender",
+          filter: true,
+          dropdownOptions: [
+            { id: "1", text: "Male" , value: "MALE"},
+            { id: "0", text: "Female" , value: "FEMALE"},
+          ],
         },
       },
       {
         controlType: 'input',
         colSize: 'col-12 md:col-6',
         options: {
-          label: 'Phone Number',
-          formControlName: 'phoneNumber',
-          validators: { required: true },
+          label: 'Township',
+          formControlName: 'township',
         },
-      },
-      {
-        controlType: 'input',
-        colSize: 'col-12 md:col-6',
-        options: {
-          label: 'Email',
-          formControlName: 'email',
-          validators: { required: true },
-        },
-      },
+      },  
       {
         controlType: 'input',
         colSize: 'col-12 md:col-6',
         options: {
           label: 'Address',
           formControlName: 'address',
+        },
+      },
+      {
+        controlType: 'calendar-picker',
+        colSize: 'col-12 md:col-6',
+        id: 'date',
+        options: {
+          label: 'Date',
+          formControlName: 'date',
+          dateFormat: 'yy-mm-dd',
+          placeholder: 'select date',
+          validators: {
+            required: true
+          }
+        }
+      },
+      // {
+      //   controlType: 'file-upload',
+      //   colSize: 'col-12 md:col-6',
+      //   options: {
+      //     label: 'Photo',
+      //     formControlName: 'photo',
+
+      //     validators: { required: true },
+      //     accept: 'image/*',
+      //     maxFileSize: 1048576, // 1 MB
+      //     multiple: false,
+
+      //   },
+      // },
+      {
+        controlType: 'file-upload',
+        colSize: 'col-12 md:col-6',
+        options: {
+          label: 'Photo',
+          formControlName: 'photo',
           validators: { required: true },
-        },
-      },
-      {
-        controlType: 'input',
-        colSize: 'col-12 md:col-6',
-        options: {
-          label: 'Grade Level',
-          formControlName: 'gradeLevel',
-          validators: { required: true },
-        },
-      },
-      {
-        controlType: 'input',
-        colSize: 'col-12 md:col-6',
-        options: {
-          label: 'Student Number',
-          formControlName: 'studentNumber',
-        },
-      },
-      {
-        controlType: 'input',
-        colSize: 'col-12 md:col-6',
-        options: {
-          label: 'Parent Name',
-          formControlName: 'parentName',
-        },
-      },
-      {
-        controlType: 'input',
-        colSize: 'col-12 md:col-6',
-        options: {
-          label: 'Parent Phone Number',
-          formControlName: 'parentPhoneNumber',
-        },
-      },
+          accept: 'image/*',
+          maxFileSize: 1048576,
+          multiple: false,
+          // onFileSelected removed: handle file selection in the component if needed
+         
+        }
+      }
+      
+    
     ];
 
     this.form = this.formFactory.createForm(this.formFields);

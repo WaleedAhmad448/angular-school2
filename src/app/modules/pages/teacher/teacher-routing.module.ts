@@ -17,6 +17,10 @@ const routes: Routes = [
         path: 'edit/:id',
         loadComponent: () => import('./teacher-create/teacher-create.component').then(m => m.TeacherCreateComponent)        
     },
+    {
+        path: 'delete/:id',
+        loadComponent: () => import('./teacher-create/teacher-create.component').then(m => m.TeacherCreateComponent)
+    },
 ];
 
 @NgModule({

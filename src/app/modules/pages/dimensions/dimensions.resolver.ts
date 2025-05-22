@@ -241,7 +241,7 @@ export const DimensionsResolver: ResolveFn<PageListOptions> = (
     let pageConfig: PageListOptions = {
         id: 'dimensions',
         route: 'dimensions',
-        module: ModulesNames.FileWare,
+        module: ModulesNames.school,
         entity: EntitiesNames.dimensions,
         version: 'v1',
         filters: filters,

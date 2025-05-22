@@ -139,7 +139,7 @@ export const getBaseUrl = () => {
     origin = window.location.origin;
   } else {
     const tenant = getTenantFromSubdomain();
-    origin = `https://${tenant}.${environment.apiBaseUrl}`;
+    origin = `${tenant}.${environment.apiBaseUrl}`;
   }
   return `${origin}`;
 };

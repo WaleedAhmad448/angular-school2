@@ -46,27 +46,16 @@ export class StudentListComponent implements OnInit {
   
   ngOnInit(): void {
     this.initTableConfig();
-    // this._getData.pipe(debounceTime(500)).subscribe(() => {
-    //   this.fetchStudentsData();
-    // });
-    // this._getData.next();
+    this._getData.pipe(debounceTime(500)).subscribe(() => {
+      this.fetchStudentsData();
+    });
+    this._getData.next();
   }
 
   ngOnDestroy(): void {
     this._getData.unsubscribe();
   }
 
-  // fetchStudentsData() {
-  //   this.studentService.getAllStudents().subscribe({
-  //     next: (response: Student[]) => {
-  //       this.students = response;
-  //       this.tableConfig.data = response;
-  //     },
-  //     error: (error) => {
-  //       this.errorHandlerService.handleError(error, this.messageService);
-  //     }
-  //   });
-  // }
 fetchStudentsData() {
   this.studentService.getAllStudents().subscribe({
     next: (response: Student[]) => {
@@ -229,14 +218,14 @@ initTableConfig() {
         colorClass: 'p-button-danger',
       },
     ],
-    fetchApiInfo:{
-      module: 'student',
-      entity: 'get',
-      path: 'all',
-      version: '',
-      baseUri: this.serverBaseUrl,
-      _getData: new Subject<void>(),
-    },
+    // fetchApiInfo:{
+    //   module: 'student',
+    //   entity: 'get',
+    //   path: 'all',
+    //   version: '',
+    //   baseUri: this.serverBaseUrl,
+    //   _getData: new Subject<void>(),
+    // },
     onSelectedItems: (e) => {
       console.log('Selected students', e);
     },

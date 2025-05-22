@@ -4,5 +4,4 @@ export const environment = {
     apiBaseUrl: '',
     baseUrl: '', // API للتطوير
     platform: 'kitsys',
-    // devToken: '',
 };

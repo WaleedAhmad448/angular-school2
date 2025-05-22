@@ -69,7 +69,7 @@ export const ArchiveTypesResolver: ResolveFn<PageListOptions> = (
                     console.log(event);
                 },
                 filter: true,
-                module: ModulesNames.FileWare,
+                module: ModulesNames.school,
                 entity: EntitiesNames.dimensions,
                 version: 'v1',
                 apiBaseUrl: getBaseUrl(),
@@ -146,7 +146,7 @@ export const ArchiveTypesResolver: ResolveFn<PageListOptions> = (
                     console.log(event);
                 },
                 filter: true,
-                module: ModulesNames.FileWare,
+                module: ModulesNames.school,
                 entity: EntitiesNames.dimensions,
                 version: 'v1',
                 apiBaseUrl: getBaseUrl(),
@@ -209,7 +209,7 @@ export const ArchiveTypesResolver: ResolveFn<PageListOptions> = (
                                     console.log(event);
                                 },
                                 filter: true,
-                                module: ModulesNames.FileWare,
+                                module: ModulesNames.school,
                                 entity: EntitiesNames.docTypes,
                                 version: 'v1',
                                 apiBaseUrl: getBaseUrl(),
@@ -396,7 +396,7 @@ export const ArchiveTypesResolver: ResolveFn<PageListOptions> = (
     let pageConfig: PageListOptions = {
         id: 'archiveTypes',
         route: 'archive-types',
-        module: ModulesNames.FileWare,
+        module: ModulesNames.school,
         entity: EntitiesNames.archiveTypes,
         version: 'v1',
         filters: filters,
