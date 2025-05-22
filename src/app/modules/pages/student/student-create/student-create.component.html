@@ -11,3 +11,10 @@
   </div>
 </div>
 <p-toast></p-toast>
+
+<ng-template #ImageField let-value>
+  <img *ngIf="value" [src]="getPhotoUrl(value)" alt="" class="w-2rem h-2rem border-round" />
+  <div *ngIf="!value" class="w-2rem h-2rem border-round bg-gray-200 flex align-items-center justify-content-center">
+    <i class="pi pi-user"></i>
+  </div>
+</ng-template>

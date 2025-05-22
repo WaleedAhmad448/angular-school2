@@ -100,21 +100,21 @@ export class HomeComponent {
       return;
     }
   
-    this.studentService.createStudent(data).subscribe({
-      next: (response) => {
-        this.submitted = true;
-        this.dialogRef.close();
-        window.location.reload();
-      },
-      error: (error) => {
-        console.error('Error creating student:', error);
-        swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'An error occurred while creating the student.',
-        });
-      }
-    });
+    // this.studentService.createStudent(data).subscribe({
+    //   next: (response) => {
+    //     this.submitted = true;
+    //     this.dialogRef.close();
+    //     window.location.reload();
+    //   },
+    //   error: (error) => {
+    //     console.error('Error creating student:', error);
+    //     swal.fire({
+    //       icon: 'error',
+    //       title: 'Error',
+    //       text: 'An error occurred while creating the student.',
+    //     });
+    //   }
+    // });
   }  
   onCancel(): void {
     this.submitted = false;

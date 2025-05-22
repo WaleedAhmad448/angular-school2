@@ -92,7 +92,7 @@ updateStudent(): void {
       next: (photoUrl: string) => {
         if (this.student) { 
           this.student.photo = photoUrl;
-          this.performStudentUpdate();
+          // this.performStudentUpdate();
           this.showDialog = false;
         }
       },
@@ -101,25 +101,25 @@ updateStudent(): void {
       }
     });
   } else {
-    this.performStudentUpdate();
+    // this.performStudentUpdate();
   }
 }
 
-performStudentUpdate(): void {
-  if (!this.student) {
-    return;
-  }
-  this.student.gender = this.selectedGender;
-  this.studentService.updateStudent(this.student.studentId, this.student).subscribe({
-    next: (response: any) => {
-      console.log('Student updated successfully:', response);
-      this.showDialog = false;
-    },
-    error: (error) => {
-      console.error('Error updating student:', error);
-    }
-  });
-}
+// performStudentUpdate(): void {
+//   if (!this.student) {
+//     return;
+//   }
+//   this.student.gender = this.selectedGender;
+//   this.studentService.updateStudent(this.student.studentId, this.student).subscribe({
+//     next: (response: any) => {
+//       console.log('Student updated successfully:', response);
+//       this.showDialog = false;
+//     },
+//     error: (error) => {
+//       console.error('Error updating student:', error);
+//     }
+//   });
+// }
 
 onFileSelected(event: any): void {
   console.log('Current student:', this.student);

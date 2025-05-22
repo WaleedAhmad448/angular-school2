@@ -25,41 +25,34 @@ export class StudentService {
   getAllByStudentName(studentName: string): Observable<Student[]> {
     return this.http.get<Student[]>(`${baseUrl}/name?studentName=${studentName}`);
   }
-
-  // createStudent(student: Student): Observable<Student> {
-  //   return this.http.post<Student>(`${baseUrl}/create`, student);
-  // }
-  createStudent(studentData: any, photoFile?: File): Observable<Student> {
+   createStudent(student: Student, photo?: File): Observable<Student> {
     const formData = new FormData();
     
-    // أضف جميع الحقول النصية
-    formData.append('studentName', studentData.studentName);
-    formData.append('studentNrc', studentData.studentNrc);
-    formData.append('age', studentData.age.toString());
-    formData.append('dateOfBirth', this.formatDate(studentData.dateOfBirth));
-    formData.append('fatherName', studentData.fatherName);
-    formData.append('gender', studentData.gender);
-    formData.append('address', studentData.address);
-    formData.append('township', studentData.township);
-    formData.append('date', this.formatDate(studentData.date));
+    // إضافة البيانات
+    formData.append('student', JSON.stringify(student));
     
-    // أضف ملف الصورة إذا كان موجودًا
-    if (photoFile) {
-      formData.append('file', photoFile);
+    // إضافة الصورة إذا كانت موجودة
+    if (photo) {
+      formData.append('photo', photo);
     }
-
-    return this.http.post<Student>('http://localhost:8080/student/create', formData);
+    
+    return this.http.post<Student>(`${baseUrl}/create`, formData);
   }
 
-  private formatDate(date: any): string {
-    if (!date) return '';
-    const d = new Date(date);
-    return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
+  updateStudent(id: number, student: Student, photo?: File): Observable<Student> {
+    const formData = new FormData();
+    
+    // إضافة البيانات
+    formData.append('student', JSON.stringify(student));
+    
+    // إضافة الصورة إذا كانت موجودة
+    if (photo) {
+      formData.append('photo', photo);
+    }
+    
+    return this.http.put<Student>(`${baseUrl}/update/${id}`, formData);
   }
 
-  updateStudent(id: number, student: Student): Observable<Student> {
-    return this.http.put<Student>(`${baseUrl}/update/${id}`, student);
-  }
 
   deleteStudent(id: number): Observable<any> {
     return this.http.delete(`${baseUrl}/delete/${id}`);

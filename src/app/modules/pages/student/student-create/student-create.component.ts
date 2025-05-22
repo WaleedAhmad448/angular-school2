@@ -12,9 +12,11 @@ import {
   PageHeadeingOptions,
   PageHeading,
 } from 'src/app/common/page-heading/page-heading.component';
+import { Student } from 'src/app/core/model/student.model';
 import { ErrorHandlerService } from 'src/app/core/service/error-handler.service';
 import { StudentService } from 'src/app/core/service/student.service';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-student-create',
@@ -85,23 +87,39 @@ export class StudentCreateComponent {
 
   submit() {
     this.form.markAllAsTouched();
-    this.form.updateValueAndValidity();
     if (this.form.invalid) {
       this.scrollToFirstError();
+      return;
+    }
+
+    const formValue = this.form.value;
+    const photoFile = this.form.get('photo')?.value;
+
+    // تحويل البيانات إلى نموذج Student
+    const studentData: Student = {
+      id: formValue.id,
+      studentName: formValue.studentName,
+      studentNrc: formValue.studentNrc,
+      age: formValue.age,
+      dateOfBirth: formValue.dateOfBirth,
+      fatherName: formValue.fatherName,
+      gender: formValue.gender,
+      township: formValue.township,
+      address: formValue.address,
+      date: formValue.date,
+      photo: typeof photoFile === 'string' ? photoFile : undefined,
+      mark: formValue.mark // Add this line, or set a default value if needed
+    };
+
+    if (this.pageUrl === 'edit') {
+      this.update(studentData, photoFile instanceof File ? photoFile : undefined);
     } else {
-      if (this.pageUrl === 'edit') {
-        this.update();
-      } else {
-        this.create();
-      }
+      this.create(studentData, photoFile instanceof File ? photoFile : undefined);
     }
   }
 
-  create() {
-    const formValue = this.form.value;
-    const photoFile = this.form.get('photo')?.value;
-    
-    this.studentService.createStudent(formValue, photoFile).subscribe({
+  private create(student: Student, photo?: File) {
+    this.studentService.createStudent(student, photo).subscribe({
       next: () => {
         this.messageService.add({
           severity: 'success',
@@ -116,24 +134,23 @@ export class StudentCreateComponent {
     });
   }
 
-  update() {
-    const request = this.editMapToApi(this.form.value);
-    this.studentService
-      .updateStudent(this.form.value.id, request)
-      .subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Student updated successfully',
-          });
-          this.router.navigate(['student']);
-        },
-        error: (error) => {
-          this.errorHandlerService.handleError(error, this.messageService);
-        },
-      });
+  private update(student: Student, photo?: File) {
+    this.studentService.updateStudent(this.studentId, student, photo).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Student updated successfully'
+        });
+        this.router.navigate(['student']);
+      },
+      error: (error) => {
+        this.errorHandlerService.handleError(error, this.messageService);
+      }
+    });
   }
+
+ 
 
   addMapToApi(data: any) {
     return {
@@ -309,42 +326,37 @@ export class StudentCreateComponent {
           }
         }
       },
-      // {
-      //   controlType: 'file-upload',
-      //   colSize: 'col-12 md:col-6',
-      //   options: {
-      //     label: 'Photo',
-      //     formControlName: 'photo',
-
-      //     validators: { required: true },
-      //     accept: 'image/*',
-      //     maxFileSize: 1048576, // 1 MB
-      //     multiple: false,
-
-      //   },
-      // },
       {
-        controlType: 'file-upload',
-        colSize: 'col-12 md:col-6',
-        options: {
-          label: 'Photo',
-          formControlName: 'photo',
-          validators: { required: true },
-          accept: 'image/*',
-          maxFileSize: 1048576,
-          multiple: false,
-          // onFileSelected removed: handle file selection in the component if needed
-         
+      controlType: 'file-upload',
+      colSize: 'col-12 md:col-6',
+      options: {
+        label: 'Photo',
+        formControlName: 'photo',
+        validators: { required: this.pageUrl === 'add' },
+        accept: 'image/*',
+        maxFileSize: 1000000,
+        ngModelChange: (event: any) => {
+          if (event.files && event.files.length > 0) {
+            this.form.get('photo')?.setValue(event.files[0]);
+          } else {
+            this.form.get('photo')?.setValue(null);
+          }
         }
       }
-      
+    }
     
-    ];
-
+  ];
     this.form = this.formFactory.createForm(this.formFields);
-    // إضافة id بشكل يدوي إذا لم يكن موجود
     if (!this.form.contains('id')) {
       this.form.addControl('id', new FormControl(null));
     }
+  }
+
+  getPhotoUrl(photoPath: string): string {
+    if (!photoPath) return '';
+    if (photoPath.startsWith('http') || photoPath.startsWith('data:')) {
+      return photoPath;
+    }
+    return `${environment.baseUrl}${photoPath.startsWith('/') ? '' : '/'}${photoPath}`;
   }
 }

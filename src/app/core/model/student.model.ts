@@ -1,7 +1,7 @@
 import { Gender } from './gender.enum';
 import { Mark } from './Mark.model';
 export class Student {
-
+    id?: number;
     date?: Date;
     studentId?: any;
     studentName ?: string;
@@ -14,4 +14,6 @@ export class Student {
     township?: string;
     photo?: string;
     mark!: Mark[];
+    createdAt?: Date;
+    updatedAt?: Date;
 }
