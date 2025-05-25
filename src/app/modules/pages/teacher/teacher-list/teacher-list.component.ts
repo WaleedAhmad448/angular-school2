@@ -4,13 +4,12 @@ import { Router } from '@angular/router';
 import { KitsngTableConfig, KitsngTableFactoryModule } from 'kitsng-table-factory';
 import { MessageService } from 'primeng/api';
 import { debounceTime, Observable, Subject } from 'rxjs';
-import { ApiQueryDto, ContextService } from 'saned-shared-lib';
 import { PageHeadeingOptions, PageHeading } from 'src/app/common/page-heading/page-heading.component';
-import { EntitiesNames, ModulesNames } from 'src/app/core/model/enums.model';
-import { ApiService } from 'src/app/core/service/api.service';import { SharedModule } from 'src/app/shared/shared.module';
+import { SharedModule } from 'src/app/shared/shared.module';
 import { TeacherService } from 'src/app/core/service/teacher.service';
 import { ErrorHandlerService } from 'src/app/core/service/error-handler.service';
 import { environment } from 'src/environments/environment';
+import { Teacher } from 'src/app/core/model/teachers.model';
 
 @Component({
   selector: 'app-teacher-list',
@@ -21,12 +20,11 @@ import { environment } from 'src/environments/environment';
   providers: [MessageService],
 })
 export class TeacherListComponent implements OnInit {
-  ctxService = inject(ContextService);
-  apiService : ApiService = inject(ApiService);
-  @ViewChild('ImageField', { static: true }) imageTemplate!: TemplateRef<any>; 
+  @ViewChild('ImageField', { static: true }) imageTemplate!: TemplateRef<any>;
+
   teacherService = inject(TeacherService);
   router = inject(Router);
-  
+
   serverBaseUrl: string = environment.apiBaseUrl;
   query: string = '';
 
@@ -46,33 +44,36 @@ export class TeacherListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-  
     this._getData.next();
   }
 
   ngOnDestroy(): void {
     this._getData.unsubscribe();
   }
+
   fetchTeacherData() {
-  this.apiService._initService(ModulesNames.school, EntitiesNames.teacher,'v1');
-   this.getData$.pipe(debounceTime(500)).subscribe(() => {
-    const query: ApiQueryDto | any = {};
-      if (this.query != null || this.query != undefined) {
-        query['search'] = this.query;
+    this.getData$.pipe(debounceTime(500)).subscribe(() => {
+      if (this.query?.trim()) {
+        this.teacherService.searchByName(this.query).subscribe({
+          next: (teachers: Teacher[]) => {
+            this.tableConfig.data = teachers;
+          },
+          error: (error) => {
+            this.errorHandlerService.handleError(error, this.messageService);
+          }
+        });
+      } else {
+        this.teacherService.getAll().subscribe({
+          next: (teachers: Teacher[]) => {
+            this.tableConfig.data = teachers;
+          },
+          error: (error) => {
+            this.errorHandlerService.handleError(error, this.messageService);
+          }
+        });
       }
-      this.apiService.getPaged(query).subscribe({
-        next: (response : any) => {
-          console.log('TeacherData',response)
-          this.tableConfig.data = response.items;
-        },
-        error: (error) =>{
-          console.log('Error Fetching Teacher Data', error);
-          this.errorHandlerService.handleError(error,this.messageService);
-        } 
-      }) 
-  });
-}
-  
+    });
+  }
 
   clearSearch() {
     this.query = '';
@@ -87,9 +88,7 @@ export class TeacherListComponent implements OnInit {
     this.headerOptions = {
       title: 'Teachers',
       containerClass: 'card mb-3 pb-3',
-      breadcrumbs: [
-        { label: 'Teachers' },
-      ],
+      breadcrumbs: [{ label: 'Teachers' }],
       actions: [
         {
           label: 'Add Teacher',
@@ -125,17 +124,15 @@ export class TeacherListComponent implements OnInit {
       actionButtons: [
         {
           icon: 'pi pi-pencil',
-             onClick: (e) => {
-                console.log(e);
-              this.router.navigate([ 'teacher','edit']);
+          onClick: (teacher) => {
+            this.router.navigate(['teacher', 'edit', teacher.id]);
           },
           colorClass: 'p-button-info',
         },
         {
           icon: 'pi pi-trash',
-          onClick: (e) => {
-            console.log(e);
-            this.router.navigate(['teacher', 'delete']);
+          onClick: (teacher) => {
+            this.router.navigate(['teacher', 'delete', teacher.id]);
           },
           colorClass: 'p-button-danger',
         }

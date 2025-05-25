@@ -13,11 +13,11 @@ export class GenerService<T> {
   constructor(private http: HttpClient) {}
 
   getAll(endpoint: string): Observable<T[]> {
-    return this.http.get<T[]>(`${this.baseApiUrl}/${endpoint}/get/all`);
+    return this.http.get<T[]>(`${this.baseApiUrl}/${endpoint}/all`);
   }
 
   getById(endpoint: string, id: number): Observable<T> {
-    return this.http.get<T>(`${this.baseApiUrl}/${endpoint}/get/${id}`);
+    return this.http.get<T>(`${this.baseApiUrl}/${endpoint}/${id}`);
   }
 
   searchByName(endpoint: string, nameParam: string, value: string): Observable<T[]> {
@@ -26,7 +26,7 @@ export class GenerService<T> {
   }
 
   create(endpoint: string, data: T): Observable<T> {
-    return this.http.post<T>(`${this.baseApiUrl}/${endpoint}/create`, data);
+    return this.http.post<T>(`${this.baseApiUrl}/${endpoint}/form`, data);
   }
 
   update(endpoint: string, id: number, data: T): Observable<T> {

@@ -6,7 +6,7 @@ import { Teacher } from '../model/teachers.model'; // تأكد من مسار ا�
   providedIn: 'root'
 })
 export class TeacherService {
-  private endpoint = 'teacher';
+private endpoint = 'api/default/school/teacher/v1';
 
   constructor(private api: GenerService<Teacher>) {}
 
