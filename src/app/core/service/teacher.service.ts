@@ -22,9 +22,23 @@ private endpoint = 'api/default/school/teacher/v1';
     return this.api.searchByName(this.endpoint, 'fullName', name);
   }
 
-  create(teacher: Teacher) {
-    return this.api.create(this.endpoint, teacher);
+  // create(teacher: Teacher) {
+  //   return this.api.create(this.endpoint, teacher);
+  // }
+  create(teacher: Teacher, imageFile?: File) {
+  const formData = new FormData();
+  
+  // أضف الحقول العادية (غير الصورة) إلى formData كـ JSON string
+  formData.append('teacher', new Blob([JSON.stringify(teacher)], { type: 'application/json' }));
+
+  // أضف الصورة إذا موجودة
+  if (imageFile) {
+    formData.append('image', imageFile);
   }
+
+  return this.api.createFormData(this.endpoint, formData);
+}
+
 
   update(id: number, teacher: Teacher) {
     return this.api.update(this.endpoint, id, teacher);

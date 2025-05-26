@@ -15,6 +15,7 @@ import {
   PageHeading,
 } from 'src/app/common/page-heading/page-heading.component';
 import { EntitiesNames, ModulesNames } from 'src/app/core/model/enums.model';
+import { Teacher } from 'src/app/core/model/teachers.model';
 import { ApiService } from 'src/app/core/service/api.service';
 import { ErrorHandlerService } from 'src/app/core/service/error-handler.service';
 import { TeacherService } from 'src/app/core/service/teacher.service';
@@ -43,7 +44,6 @@ export class TeacherCreateComponent {
     teacherData: any;
     @ViewChild('ImageField', { static: true }) imageTemplate!: TemplateRef<any>;
     @ViewChild('importFileInput') importFileInput!: ElementRef;
-    serverBaseUrl: string = 'http://localhost:8080';
     query: string = '';
     _getData: Subject<void> = new Subject();
     getData$: Observable<void> = this._getData.asObservable();
@@ -51,6 +51,7 @@ export class TeacherCreateComponent {
     form!: FormGroup;
     formFields: KitsngFormFactoryModel[] = [];
     headerOptions!: PageHeadeingOptions;
+  selectedImageFile: any;
     constructor(public formFactory: KitsngFormFactoryService,private teacherService : TeacherService,
         private errorHandlerService: ErrorHandlerService, private messageService: MessageService) {
         this.checkPageUrl();
@@ -103,29 +104,60 @@ export class TeacherCreateComponent {
         }
        }
     }
-    create(){
-        const data = this.addMapToApi(this.form.getRawValue());
-        console.log(data)
-        this.apiService._initService(ModulesNames.school, EntitiesNames.teacher,'v1');
-        this.form.disable()
-         this.apiService.add(data).pipe(finalize(() => this.form.enable())).subscribe({
-            next: (response) => {
-                console.log('Data',response);
-                this.messageService.add({ severity: 'info', summary: 'Confirmed', detail: 'Your data have been added successfully' });
-                this.router.navigate(['student','add'])
-            },
-            error:(error) =>{
-                this.form.enable()
-                console.log('Error Fetching Data',error);
-                this.errorHandlerService.handleError(error,this.messageService);
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: `Error Add Data`,
-                });
-            }
-         });
+
+    onSubmit() {
+  const teacherData: Teacher = this.form.value;  // بيانات النموذج عدا الصورة
+  const imageFile = this.selectedImageFile;      // ملف الصورة المختار من input file
+  
+  this.teacherService.create(teacherData, imageFile).subscribe({
+    next: (res) => {
+      this.messageService.add({ severity: 'success', detail: 'Teacher created' });
+    },
+    error: (err) => {
+      console.error('Error Add Data full object:', err);
+      this.messageService.add({ severity: 'error', detail: 'Error Add Data' });
     }
+  });
+}
+
+ create() {
+  const formData = new FormData();
+  const data = this.form.getRawValue();
+
+  // أضف بيانات الفورم ما عدا الصورة
+  Object.keys(data).forEach(key => {
+    if (key !== 'image') {
+      let value = data[key];
+      // لو القيم مصفوفة أو كائنات تحتاج تحويل
+      if (Array.isArray(value) || typeof value === 'object') {
+        value = JSON.stringify(value);
+      }
+      formData.append(key, value);
+    }
+  });
+
+  // أضف الصورة لو موجودة
+  if (data.image && data.image instanceof File) {
+    formData.append('image', data.image, data.image.name);
+  }
+
+  this.apiService._initService(ModulesNames.school, EntitiesNames.teacher, 'v1');
+  this.form.disable();
+
+  this.apiService.add(formData).pipe(finalize(() => this.form.enable())).subscribe({
+    next: (response) => {
+      this.messageService.add({ severity: 'info', summary: 'Confirmed', detail: 'Your data have been added successfully' });
+      this.router.navigate(['teacher', 'add']);
+    },
+    error: (error) => {
+      console.error('Error Add Data:', error);
+      this.form.enable();
+      this.errorHandlerService.handleError(error, this.messageService);
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error Add Data' });
+    }
+  });
+}
+
     update(){
         const data = this.editMapToApi(this.form.getRawValue());
         console.log(data)
@@ -149,137 +181,151 @@ export class TeacherCreateComponent {
             }
          });
     }
-    editMapToApi(data: any){
-        delete data['periodTotal'];
-        // data['id'] = this.financialPeriodData.yearId;
-        return data;
+  addMapToApi(data: any) {
+      // تحويل التاريخ لصيغة ISO
+      data['birthDate'] = data['birthDate'] ? new Date(data['birthDate']).toISOString() : '';
+      return data;
     }
-    addMapToApi(data: any){
-     delete data['periodTotal'];
-     data['endDate'] = data['endDate'] ? new Date(data['endDate']).toISOString() : '';
-     data['periods']= data['periods'].map((item: any) =>{
-        return {
-            ...item,
-            startDate: item.startDate ? new Date(item.startDate).toISOString() : '',
-            // code: "Azaam"
-        }
-     })
-     return data;
-    }
-    mapFromApi(data : any){
-       data['periodTotal'] = this._arrayFormLength;
-       data['periods'] = data['periods'].map((item:any)=>{
-        return{
-            ...item,
-            id: item.id,
-            startDate: item.startDate ? new Date(item.startDate) : null,
 
-        }
-       })
-        return data;
-       }
-    scrollToFirstError() {
-        const invalidElements =
-          this.formContainerRef?.nativeElement?.querySelectorAll(":not(form).ng-invalid");
-        if (invalidElements?.length > 0) {
-          invalidElements?.[0]?.scrollIntoView({ behavior: "smooth" });
-        }
+  editMapToApi(data: any) {
+      data['id'] = this.teatherId;
+      data['birthDate'] = data['birthDate'] ? new Date(data['birthDate']).toISOString() : '';
+      return data;
+    }
+
+
+
+  mapFromApi(data: any) {
+    this.form.patchValue({
+      fullName: data.fullName,
+      email: data.email,
+      birthDate: data.birthDate ? new Date(data.birthDate) : null,
+      phoneNumber: data.phoneNumber,
+      address: data.address,
+      image: data.image,
+    });
+  }
+
+  scrollToFirstError() {
+      const invalidElements =
+        this.formContainerRef?.nativeElement?.querySelectorAll(":not(form).ng-invalid");
+      if (invalidElements?.length > 0) {
+        invalidElements?.[0]?.scrollIntoView({ behavior: "smooth" });
       }
-      back(){
-        window.history.back()
-      }
+    }
+    back(){
+      window.history.back()
+    }
+
     initHeaderOptions() {
-        let self = this;
-
-        this.headerOptions = {
-            title:this.pageUrl == 'edit' ? 'Update Financial Period' : 'Create New Financial Period',
-            description: 'fill all required fields',
-            containerClass: 'card mb-3 pb-3',
-            breadcrumbs: [
-                {
-                  label: "Financial Periods",
-                  routerLink: "/finance/financial-periods"
-                },
-                {
-                    label: this.pageUrl=='edit' ? 'Update Financial Period' :'Create New Financial Period',
-                },
-            ],
-            actions: [],
-        };
+      this.headerOptions = {
+        title: this.pageUrl == 'edit' ? 'Update Teacher' : 'Add New Teacher',
+        description: 'Fill all required fields',
+        containerClass: 'card mb-3 pb-3',
+        breadcrumbs: [
+          {
+            label: "Teachers",
+            routerLink: "/teacher/list"
+          },
+          {
+            label: this.pageUrl == 'edit' ? 'Update Teacher' : 'Add Teacher',
+          },
+        ],
+        actions: [],
+      };
     }
+
     initForm() {
-        this.formFields = [
-            {
-                colSize: 'col-12 md:col-6',
-                controlType: 'dropdown',
-                options: {
-                    label: 'Period Type',
-                    formControlName: 'periodType',
-                    validators: { required: true },
-                    placeholder: 'Select Type',
-                    containerClass: 'align-items-center pl-4 sm:pl-6',
-                    controlLayout: 'horizontal',
-                    labelColSize: 'col-4',
-                    controlColSize: 'col-8',
-                },
-            },
+      this.form = this.formFactory.createForm(this.formFields);
+      this.form.addControl('image', new FormControl(null));
 
-            {
-                colSize: 'col-12 md:col-6',
-                controlType: 'lookup-select',
-                options: {
-                    label: 'Year',
-                    formControlName: 'yearId',
-                    validators: { required: true },
-                    placeholder: 'Select Year',
-                    containerClass: 'align-items-center pl-4 sm:pl-6',
-                    controlLayout: 'horizontal',
-                    labelColSize: 'col-4',
-                    controlColSize: 'col-8',
-                    
-                },
-            },
-            {
-                controlType: 'calendar-picker',
-                colSize: 'col-12 md:col-6',
-                options: {
-                    label: 'End Date',
-                    formControlName: 'endDate',
-                    placeholder:'mm/dd/yyyy',
-                    disabled: true,
-                    containerClass: 'align-items-center pl-4 sm:pl-6',
-                    controlLayout: 'horizontal',
-                    labelColSize: 'col-4',
-                    controlColSize: 'col-8',
-                },
-            },
-            {
-                controlType: 'input-number',
-                colSize: 'col-12 md:col-6',
-                options: {
-                    label: 'Periods Total',
-                    formControlName: 'periodTotal',
-                    readonly: true,
-                    containerClass: 'align-items-center pl-4 sm:pl-6',
-                    controlLayout: 'horizontal',
-                    labelColSize: 'col-4',
-                    controlColSize: 'col-8',
-                },
-            },
-            {
-                controlType: 'input',
-                colSize: 'col-12',
-                options: {
-                    label: 'Periods',
-                    formControlName: 'periods',
-                    formControlType: 'array',
-                    arrayLayout: 'table',
-                    
-                },
-            },
-        ];
-        this.form = this.formFactory.createForm(this.formFields);
+      this.formFields = [
+        {
+          colSize: 'col-12 md:col-6',
+          controlType: 'input',
+          options: {
+            label: 'Full Name',
+            formControlName: 'fullName',
+            validators: { required: true },
+            placeholder: 'Enter full name',
+            containerClass: 'align-items-center pl-4 sm:pl-6',
+            controlLayout: 'horizontal',
+            labelColSize: 'col-4',
+            controlColSize: 'col-8',
+          },
+        },
+        {
+          colSize: 'col-12 md:col-6',
+          controlType: 'input',
+          options: {
+            label: 'Email',
+            formControlName: 'email',
+            validators: { required: true },
+            placeholder: 'Enter email',
+            containerClass: 'align-items-center pl-4 sm:pl-6',
+            controlLayout: 'horizontal',
+            labelColSize: 'col-4',
+            controlColSize: 'col-8',
+          },
+        },
+        {
+          colSize: 'col-12 md:col-6',
+          controlType: 'calendar-picker',
+          options: {
+            label: 'Birth Date',
+            formControlName: 'birthDate',
+            placeholder: 'mm/dd/yyyy',
+            containerClass: 'align-items-center pl-4 sm:pl-6',
+            controlLayout: 'horizontal',
+            labelColSize: 'col-4',
+            controlColSize: 'col-8',
+          },
+        },
+        {
+          colSize: 'col-12 md:col-6',
+          controlType: 'input',
+          options: {
+            label: 'Phone Number',
+            formControlName: 'phoneNumber',
+            placeholder: 'Enter phone number',
+            containerClass: 'align-items-center pl-4 sm:pl-6',
+            controlLayout: 'horizontal',
+            labelColSize: 'col-4',
+            controlColSize: 'col-8',
+          },
+        },
+        {
+          colSize: 'col-12',
+          controlType: 'textarea',
+          options: {
+            label: 'Address',
+            formControlName: 'address',
+            placeholder: 'Enter address',
+            rows: 3,
+            containerClass: 'align-items-center pl-4 sm:pl-6',
+            controlLayout: 'horizontal',
+            labelColSize: 'col-2',
+            controlColSize: 'col-10',
+          },
+        },
+        {
+          controlType: 'file-upload', // أو يمكن استخدام 'input' مع نوع 'file' حسب المكتبة
+          colSize: 'col-12 md:col-6',
+          options: {
+            label: 'Teacher Image',
+            formControlName: 'image',
+            accept: 'image/*',  // قبول الصور فقط
+            placeholder: 'Upload Image',
+            containerClass: 'align-items-center pl-4 sm:pl-6',
+            controlLayout: 'horizontal',
+            labelColSize: 'col-4',
+            controlColSize: 'col-8',
+          },
+        },
+      ];
+      this.form = this.formFactory.createForm(this.formFields);
     }
+
     
 }
 

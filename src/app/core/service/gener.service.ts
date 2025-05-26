@@ -25,9 +25,10 @@ export class GenerService<T> {
     return this.http.get<T[]>(`${this.baseApiUrl}/${endpoint}/name`, { params });
   }
 
-  create(endpoint: string, data: T): Observable<T> {
-    return this.http.post<T>(`${this.baseApiUrl}/${endpoint}/form`, data);
+  create(endpoint: string, formData: T): Observable<T> {
+    return this.http.post<T>(`${this.baseApiUrl}/${endpoint}/form`, formData);
   }
+  
 
   update(endpoint: string, id: number, data: T): Observable<T> {
     return this.http.put<T>(`${this.baseApiUrl}/${endpoint}/update/${id}`, data);
@@ -46,4 +47,8 @@ export class GenerService<T> {
   export(endpoint: string): Observable<Blob> {
     return this.http.get(`${this.baseApiUrl}/${endpoint}/export`, { responseType: 'blob' });
   }
+  createFormData(endpoint: string, formData: FormData): Observable<any> {
+  return this.http.post(`${this.baseApiUrl}/${endpoint}/form`, formData);
+}
+
 }

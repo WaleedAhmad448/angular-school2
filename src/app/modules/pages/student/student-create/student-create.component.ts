@@ -28,6 +28,9 @@ import { environment } from 'src/environments/environment';
 })
 export class StudentCreateComponent {
   @ViewChild('formContainerRef', { static: false })
+  imagePreviewUrl: string | null = null;
+  @ViewChild('photoInput') photoInput!: ElementRef;
+
   formContainerRef!: ElementRef;
 
   router: Router = inject(Router);
@@ -108,7 +111,8 @@ export class StudentCreateComponent {
       address: formValue.address,
       date: formValue.date,
       photo: typeof photoFile === 'string' ? photoFile : undefined,
-      mark: formValue.mark // Add this line, or set a default value if needed
+    
+      mark: formValue.mark 
     };
 
     if (this.pageUrl === 'edit') {
@@ -325,26 +329,7 @@ export class StudentCreateComponent {
             required: true
           }
         }
-      },
-      {
-      controlType: 'file-upload',
-      colSize: 'col-12 md:col-6',
-      options: {
-        label: 'Photo',
-        formControlName: 'photo',
-        validators: { required: this.pageUrl === 'add' },
-        accept: 'image/*',
-        maxFileSize: 1000000,
-        ngModelChange: (event: any) => {
-          if (event.files && event.files.length > 0) {
-            this.form.get('photo')?.setValue(event.files[0]);
-          } else {
-            this.form.get('photo')?.setValue(null);
-          }
-        }
-      }
-    }
-    
+      },   
   ];
     this.form = this.formFactory.createForm(this.formFields);
     if (!this.form.contains('id')) {
@@ -352,11 +337,30 @@ export class StudentCreateComponent {
     }
   }
 
-  getPhotoUrl(photoPath: string): string {
-    if (!photoPath) return '';
-    if (photoPath.startsWith('http') || photoPath.startsWith('data:')) {
-      return photoPath;
-    }
-    return `${environment.baseUrl}${photoPath.startsWith('/') ? '' : '/'}${photoPath}`;
+  onFileSelected(event: any): void {
+    const file: File = event.target.files[0];
+    if (!file) return;
+
+    const imageUrl = URL.createObjectURL(file);
+    this.imagePreviewUrl = imageUrl;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      // تعيين الصورة للنموذج إذا لم يكن هناك رفع
+      this.form.get('photo')?.setValue(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    const options = { responseType: 'text' as 'json' };
+    this.studentService.createFile(file, 'image', options).subscribe({
+      next: (response: any) => {
+        console.log('File uploaded successfully:', response);
+        this.form.get('photo')?.setValue(response); // ⬅️ رابط الصورة من السيرفر
+      },
+      error: (error) => {
+        console.error('Error uploading file:', error);
+      }
+    });
   }
+
 }
