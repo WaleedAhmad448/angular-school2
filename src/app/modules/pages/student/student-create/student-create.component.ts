@@ -12,6 +12,7 @@ import {
   PageHeadeingOptions,
   PageHeading,
 } from 'src/app/common/page-heading/page-heading.component';
+import { Gender } from 'src/app/core/model/gender.enum';
 import { Student } from 'src/app/core/model/student.model';
 import { ErrorHandlerService } from 'src/app/core/service/error-handler.service';
 import { StudentService } from 'src/app/core/service/student.service';
@@ -32,6 +33,7 @@ export class StudentCreateComponent {
   @ViewChild('photoInput') photoInput!: ElementRef;
 
   formContainerRef!: ElementRef;
+  selectedFile: File | null = null;
 
   router: Router = inject(Router);
   activeRoute: ActivatedRoute = inject(ActivatedRoute);
@@ -40,9 +42,13 @@ export class StudentCreateComponent {
   _arrayFormLength: number = 0;
   studentId!: number;
 
+  genderEnum = Gender;
+  selectedGender: Gender = Gender.MALE;
+    
   form!: FormGroup;
   formFields: KitsngFormFactoryModel[] = [];
   headerOptions!: PageHeadeingOptions;
+  student: any;
   constructor(
     public formFactory: KitsngFormFactoryService,
     private studentService: StudentService,
@@ -110,20 +116,25 @@ export class StudentCreateComponent {
       township: formValue.township,
       address: formValue.address,
       date: formValue.date,
-      photo: typeof photoFile === 'string' ? photoFile : undefined,
-    
-      mark: formValue.mark 
+      photo: formValue.photo, 
+     mark: [{
+      date: new Date(),
+      mark1: 0,
+      mark2: 0,
+      mark3: 0,
+      total: 0
+    }]
     };
 
     if (this.pageUrl === 'edit') {
-      this.update(studentData, photoFile instanceof File ? photoFile : undefined);
+      this.update(studentData);
     } else {
-      this.create(studentData, photoFile instanceof File ? photoFile : undefined);
+      this.create(studentData);
     }
   }
 
-  private create(student: Student, photo?: File) {
-    this.studentService.createStudent(student, photo).subscribe({
+  private create(student: Student) {
+    this.studentService.createStudent(student).subscribe({
       next: () => {
         this.messageService.add({
           severity: 'success',
@@ -139,7 +150,7 @@ export class StudentCreateComponent {
   }
 
   private update(student: Student, photo?: File) {
-    this.studentService.updateStudent(this.studentId, student, photo).subscribe({
+    this.studentService.updateStudent(this.studentId, student).subscribe({
       next: () => {
         this.messageService.add({
           severity: 'success',
@@ -185,6 +196,13 @@ export class StudentCreateComponent {
       address: data.address,
       date: new Date(data.date),
       photo: data.photo,
+      mark: data.mark || [{
+        date: new Date(),
+        mark1: 0,
+        mark2: 0,
+        mark3: 0,
+        total: 0
+      }]
     });
   }
 
@@ -295,8 +313,8 @@ export class StudentCreateComponent {
           placeholder: "Select Gender",
           filter: true,
           dropdownOptions: [
-            { id: "1", text: "Male" , value: "MALE"},
-            { id: "0", text: "Female" , value: "FEMALE"},
+            { id: "0", text: "Male" , value: "MALE"},
+            { id: "1", text: "Female" , value: "FEMALE"},
           ],
         },
       },
@@ -329,38 +347,45 @@ export class StudentCreateComponent {
             required: true
           }
         }
-      },   
+      }, 
+  
   ];
     this.form = this.formFactory.createForm(this.formFields);
     if (!this.form.contains('id')) {
       this.form.addControl('id', new FormControl(null));
     }
   }
-
-  onFileSelected(event: any): void {
+    onFileSelected(event: any): void {
     const file: File = event.target.files[0];
-    if (!file) return;
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
 
-    const imageUrl = URL.createObjectURL(file);
-    this.imagePreviewUrl = imageUrl;
+      const imageUrl = URL.createObjectURL(file);
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      // تعيين الصورة للنموذج إذا لم يكن هناك رفع
-      this.form.get('photo')?.setValue(reader.result as string);
-    };
-    reader.readAsDataURL(file);
+      const reader = new FileReader();
+      reader.onload = () => {
 
-    const options = { responseType: 'text' as 'json' };
-    this.studentService.createFile(file, 'image', options).subscribe({
-      next: (response: any) => {
-        console.log('File uploaded successfully:', response);
-        this.form.get('photo')?.setValue(response); // ⬅️ رابط الصورة من السيرفر
-      },
-      error: (error) => {
-        console.error('Error uploading file:', error);
-      }
-    });
+        this.student.photo = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+      
+      const options = { responseType: 'text' as 'json' };;
+      this.studentService.createFile(file, 'image',options).subscribe({
+        next: (response: any) => {
+          const filePath = response; 
+          if (filePath) {
+            console.log('File uploaded successfully:', filePath);
+            this.student.photo = filePath;
+          }
+        },
+        error: (error) => {
+          
+          console.error('Error uploading file:', error);
+        }
+      });
+
+      this.imagePreviewUrl = imageUrl;
+    }
   }
-
 }

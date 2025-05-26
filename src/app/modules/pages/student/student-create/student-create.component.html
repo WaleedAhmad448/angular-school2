@@ -5,14 +5,20 @@
     [fields]="formFields"
     [form]="form"
 ></kitsng-form-factory>
-  <div class="form-group mb-4">
-      <input type="file" accept="image/*" class="hidden" (change)="onFileSelected($event)" #photoInput>
-      <p-button  label="Choose Photo" (click)="photoInput.click()" >
-      </p-button>
-      <div *ngIf="imagePreviewUrl" class="mt-3">
-        <img [src]="imagePreviewUrl" alt="preview" class="w-1 h-1 object-cover">
-      </div>
-  </div>
+
+  <div class="col-12 md:col-6">
+  <label for="photo">Upload Photo</label>
+  <div *ngIf="imagePreviewUrl">
+    <input
+    type="file"
+    id="photo"  
+    src="{{imagePreviewUrl}}"
+    (change)="onFileSelected($event)"
+    #fileInput
+    (click)="fileInput.click()"
+    class="p-inputtext p-component"
+  /></div>
+</div>
 
 
 

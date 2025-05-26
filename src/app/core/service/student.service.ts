@@ -25,31 +25,13 @@ export class StudentService {
   getAllByStudentName(studentName: string): Observable<Student[]> {
     return this.http.get<Student[]>(`${baseUrl}/name?studentName=${studentName}`);
   }
-  createStudent(student: Student , photo?: File): Observable<Student> {
-    const formData = new FormData();
-    if (photo) {
-      formData.append('photo', photo);
-
-    }
-      
+    createStudent(student: Student): Observable<Student> {
     return this.http.post<Student>(`${baseUrl}/create`, student);
   }
 
-  updateStudent(id: number, student: Student, photo?: File): Observable<Student> {
-    const formData = new FormData();
-    
-    // إضافة البيانات
-    formData.append('student', JSON.stringify(student));
-    
-    // إضافة الصورة إذا كانت موجودة
-    if (photo) {
-      formData.append('photo', photo);
-    }
-    
-    return this.http.put<Student>(`${baseUrl}/update/${id}`, formData);
+  updateStudent(id: number, student: Student): Observable<Student> {
+    return this.http.put<Student>(`${baseUrl}/update/${id}`, student);
   }
-
-
   deleteStudent(id: number): Observable<any> {
     return this.http.delete(`${baseUrl}/delete/${id}`);
   }
