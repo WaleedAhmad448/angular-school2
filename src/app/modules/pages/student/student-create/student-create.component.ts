@@ -17,7 +17,6 @@ import { Student } from 'src/app/core/model/student.model';
 import { ErrorHandlerService } from 'src/app/core/service/error-handler.service';
 import { StudentService } from 'src/app/core/service/student.service';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-student-create',
@@ -48,7 +47,28 @@ export class StudentCreateComponent {
   form!: FormGroup;
   formFields: KitsngFormFactoryModel[] = [];
   headerOptions!: PageHeadeingOptions;
-  student: any;
+ student: Student = {
+    date: new Date(),
+    studentId: 0,
+    studentName: '',
+    studentNrc: '',
+    age: 0,
+    dateOfBirth: new Date(),
+    fatherName: '',
+    gender: Gender.MALE,
+    address: '',
+    township: '',
+    photo: '',
+    mark: [{
+      date: new Date(),
+      mark1: 0,
+      mark2: 0,
+      mark3: 0,
+      total: 0
+    }]
+  };
+  submitted = false;
+
   constructor(
     public formFactory: KitsngFormFactoryService,
     private studentService: StudentService,

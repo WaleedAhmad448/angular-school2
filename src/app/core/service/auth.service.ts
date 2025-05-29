@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, catchError, map, Observable, of, switchMap, throwError } from 'rxjs';
-import { getBaseUrl, getTenantFromSubdomain } from '../model/http-response.model';
+import { TenantService } from './tenant.service';
 
 @Injectable({
   providedIn: 'root'
@@ -28,9 +28,10 @@ export class AuthService {
      */
     constructor(
         private _httpClient: HttpClient,
+        private tenantService: TenantService
     ) {
-      this.tenant = getTenantFromSubdomain();
-      this.baseUrl = getBaseUrl();
+      this.tenant = tenantService.tenant;
+      this.baseUrl = window.location.origin;
     }
     // -----------------------------------------------------------------------------------------------------
     // @ Accessors
@@ -53,7 +54,7 @@ export class AuthService {
     }
 
     validateToken(): Observable<boolean>{
-      const url = `${getBaseUrl()}/api/${this.tenant}/OAuth/userinfo`;
+      const url = `${this.baseUrl}/api/${this.tenant}/OAuth/userinfo`;
       return this._httpClient.get(url)
       .pipe(catchError((error)=>{
         return of(false)
@@ -64,7 +65,7 @@ export class AuthService {
       }));
     }
     getUser(): Observable<any>{
-      const url = `${getBaseUrl()}/api/${this.tenant}/OAuth/userinfo`;
+      const url = `${this.baseUrl}/api/${this.tenant}/OAuth/userinfo`;
       return this._httpClient.get<any>(url).pipe(map((res)=>{
         this.user = res;
         this._user.next(res);
@@ -72,7 +73,7 @@ export class AuthService {
       }));
     }
     logout(): Observable<any>{
-      const url = `${getBaseUrl()}/api/${this.tenant}/OAuth/Signout`;
+      const url = `${this.baseUrl}/api/${this.tenant}/OAuth/Signout`;
       return this._httpClient.post<any>(url,{});
     }
 }

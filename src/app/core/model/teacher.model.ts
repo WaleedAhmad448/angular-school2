@@ -1,7 +1,9 @@
 export interface Teacher {
   id?: number;
   fullName: string;
+  phone: string;
   email: string;
-  subject: string;
-  photoPath?: string; // اختياري
+  address: string;
+  dateOfBirth: string;
+  image?: string;
 }

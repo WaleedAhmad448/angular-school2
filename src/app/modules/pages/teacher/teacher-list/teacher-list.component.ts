@@ -6,10 +6,12 @@ import { MessageService } from 'primeng/api';
 import { debounceTime, Observable, Subject } from 'rxjs';
 import { PageHeadeingOptions, PageHeading } from 'src/app/common/page-heading/page-heading.component';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { TeacherService } from 'src/app/core/service/teacher.service';
 import { ErrorHandlerService } from 'src/app/core/service/error-handler.service';
 import { environment } from 'src/environments/environment';
-import { Teacher } from 'src/app/core/model/teachers.model';
+import { ApiService } from 'src/app/core/service/api.service';
+import { ContextService } from 'src/app/core/service/context.service';
+import { EntitiesNames, ModulesNames } from 'src/app/core/model/enums.model';
+import { ApiQueryDto } from 'src/app/core/model/http-response.model';
 
 @Component({
   selector: 'app-teacher-list',
@@ -22,58 +24,49 @@ import { Teacher } from 'src/app/core/model/teachers.model';
 export class TeacherListComponent implements OnInit {
   @ViewChild('ImageField', { static: true }) imageTemplate!: TemplateRef<any>;
 
-  teacherService = inject(TeacherService);
-  router = inject(Router);
+ctxService = inject(ContextService);
+apiService : ApiService = inject(ApiService);
+router: Router = inject(Router);
 
-  serverBaseUrl: string = environment.apiBaseUrl;
-  query: string = '';
+serverBaseUrl: string = environment.apiBaseUrl;
 
-  _getData: Subject<void> = new Subject();
-  getData$: Observable<void> = this._getData.asObservable();
+teacherData: any[] = [];
+query!: string;
 
-  tableConfig!: KitsngTableConfig;
-  headerOptions!: PageHeadeingOptions;
+_getData: Subject<void> = new Subject();
+getData$: Observable<void> = this._getData.asObservable();
 
-  constructor(
-    private errorHandlerService: ErrorHandlerService,
-    private messageService: MessageService
-  ) {
-    this.initHeaderOptions();
-    this.initTableConfig();
-    this.fetchTeacherData();
-  }
+tableConfig!: KitsngTableConfig;
+headerOptions!: PageHeadeingOptions;
+constructor(private errorHandlerService: ErrorHandlerService, private messageService: MessageService){
+  this.initHeaderOptions();
+  this.initTableConfig();
+}
 
-  ngOnInit(): void {
-    this._getData.next();
-  }
+ngOnInit(): void {
+  this.fetchTeacherData();
+  this._getData.next();
+}
 
-  ngOnDestroy(): void {
-    this._getData.unsubscribe();
-  }
-
-  fetchTeacherData() {
-    this.getData$.pipe(debounceTime(500)).subscribe(() => {
-      if (this.query?.trim()) {
-        this.teacherService.searchByName(this.query).subscribe({
-          next: (teachers: Teacher[]) => {
-            this.tableConfig.data = teachers;
-          },
-          error: (error) => {
-            this.errorHandlerService.handleError(error, this.messageService);
-          }
-        });
-      } else {
-        this.teacherService.getAll().subscribe({
-          next: (teachers: Teacher[]) => {
-            this.tableConfig.data = teachers;
-          },
-          error: (error) => {
-            this.errorHandlerService.handleError(error, this.messageService);
-          }
-        });
+ fetchTeacherData() {
+  this.apiService._initService(ModulesNames.school, EntitiesNames.teacher,'v1');
+   this.getData$.pipe(debounceTime(500)).subscribe(() => {
+    const query: ApiQueryDto | any = {};
+      if (this.query != null || this.query != undefined) {
+        query['search'] = this.query;
       }
-    });
-  }
+      this.apiService.getPaged(query).subscribe({
+        next: (response : any) => {
+          console.log('teacherData',response)
+          this.tableConfig.data = response.items;
+        },
+        error: (error) =>{
+          console.log('Error Fetching teacher Data', error);
+          this.errorHandlerService.handleError(error,this.messageService);
+        } 
+      }) 
+  });
+}
 
   clearSearch() {
     this.query = '';

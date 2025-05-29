@@ -4,6 +4,7 @@
     <kitsng-form-factory 
     [fields]="formFields"
     [form]="form"
+    (fileChange)="onFileSelected($event)">
 ></kitsng-form-factory>
 <div class="flex justify-content-end gap-1">
     <p-button type="submit" [label]="pageUrl=='edit'? 'Update': 'Submit'" (onClick)="submit()" [disabled]="form.disabled" [loading]="form.disabled"></p-button>

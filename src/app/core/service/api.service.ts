@@ -31,7 +31,7 @@ export class ApiService<T = any> {
   /**
    * Constructor
    */
-  constructor(private _httpClient: HttpClient, private _tenant: TenantService) {
+  constructor(private _httpClient: HttpClient) {
     this._initBaseUrl();
   }
   _initService(module: string, entity: string, version: string, path?: string | undefined) {
@@ -43,7 +43,7 @@ export class ApiService<T = any> {
   }
   _initBaseUrl() {
     const path = (this.path && this.path != "")? `/${this.path}`: '' ;
-    this.baseUrl = `${getBaseUrl()}/api/default/${this.module}/${this.entity}/${this.version}${path}`;
+    this.baseUrl = `${getBaseUrl()}/api/${this.module}/${this.entity}/${this.version}${path}`;
   }
   /**
    * General function for fetching data from the API.
@@ -112,8 +112,10 @@ export class ApiService<T = any> {
       );
   }
   getPaged(query: ApiQueryDto): Observable<ApiListDto<T>> {
+    console.log('Calling:', `${this.baseUrl}/paged`, 'with', query);
     return this._httpClient
       .post<ApiResponseDto<ApiListDto<T>>>(`${this.baseUrl}`, query)
+
       .pipe(
         map((response) => {
           console.log(response);

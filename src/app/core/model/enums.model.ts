@@ -1,5 +1,5 @@
 export enum ModulesNames {
-    FileWare = 'KitsysFileware',
+    // FileWare = 'KitsysFileware',
     school = 'school',
     Test = 'test',
     

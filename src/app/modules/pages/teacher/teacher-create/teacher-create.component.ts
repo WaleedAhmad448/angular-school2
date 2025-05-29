@@ -15,7 +15,7 @@ import {
   PageHeading,
 } from 'src/app/common/page-heading/page-heading.component';
 import { EntitiesNames, ModulesNames } from 'src/app/core/model/enums.model';
-import { Teacher } from 'src/app/core/model/teachers.model';
+import { Teacher } from 'src/app/core/model/teacher.model';
 import { ApiService } from 'src/app/core/service/api.service';
 import { ErrorHandlerService } from 'src/app/core/service/error-handler.service';
 import { TeacherService } from 'src/app/core/service/teacher.service';
@@ -53,44 +53,66 @@ export class TeacherCreateComponent {
     headerOptions!: PageHeadeingOptions;
   selectedImageFile: any;
     constructor(public formFactory: KitsngFormFactoryService,private teacherService : TeacherService,
-        private errorHandlerService: ErrorHandlerService, private messageService: MessageService) {
+       private errorHandlerService: ErrorHandlerService, private messageService: MessageService) {
         this.checkPageUrl();
+        this.initHeaderOptions();
+        // this.subscribeToFinancialSettings();
        
     }
+
     checkPageUrl() {
-    this.activeRoute.url.subscribe({
-      next: (value) => {
-        const urlPath = value.map((url) => url.path)[0];
-        switch (urlPath) {
-          case 'edit':
-            this.pageUrl = 'edit';
-            this.activeRoute.params.subscribe((params) => {
-              this.teatherId = +params['id'];
-              this.fetchTeacherData(); // 🟢 Load data for editing
-            });
-            break;
-          case 'add':
-            this.pageUrl = 'add';
-            this.initForm(); // 🟢 Init form for add
-            break;
-          default:
-            this.pageUrl = null;
-        }
-            this.initHeaderOptions();
-      },
-    });
-  }
-      fetchTeacherData() {
-    this.teacherService.getAll().subscribe({
-      next: (teacher) => {
-        this.initForm();
-        this.mapFromApi(teacher);
-      },
-      error: (err) => {
-        this.errorHandlerService.handleError(err, this.messageService);
-      },
-    });
-  }
+        this.activeRoute.url.subscribe({
+          next: (value) => {
+            const urlPath = value.map((url) => url.path)[0];
+            switch (urlPath) {
+              case 'edit':
+                this.pageUrl = 'edit';
+                break;
+              case 'add':
+                this.pageUrl = 'add';
+                break;
+              default:
+                this.pageUrl = null ; // Handle unexpected URLs
+                console.warn('Unknown URL:', urlPath);
+            }
+            console.log('Current page URL:', this.pageUrl);
+          },
+        });
+      }
+    // private subscribeToFinancialSettings(){
+    //     this.financialSettingService.settings$.subscribe({
+    //         next: (response) => {
+    //             console.log('response periodsSetting', response.periodsSetting);
+    //             this.periodsSettingData = response.periodsSetting;
+    //             this.initForm();
+    //             if(this.pageUrl == 'edit'){
+    //                 this.getItems();
+    //             }
+    //         }
+    //     })
+    // }
+    // getItems(){
+    //     this.financialPeriodData = window.history.state;
+    //     this._arrayFormLength = this.getNumberOfPeriodsByType(this.financialPeriodData.periodType)
+    //     const data = this.mapFromApi(this.financialPeriodData);
+    //     console.log("data form api", data)
+    //     this.initForm();
+    //     this.form.patchValue(this.financialPeriodData);
+    //     this.form.updateValueAndValidity();
+    //     console.log("Form Value", this.form.getRawValue())
+    // }
+    // getNumberOfPeriodsByType(type: PeriodTypes): number {
+    //     let number: number = 0;
+    //     if (type === PeriodTypes.Fiscal) {
+    //         return this.periodsSettingData?.numberOfFiscalPeriods ?? 0 as number;
+    //     } else if (type === PeriodTypes.Tax) {
+    //         return this.periodsSettingData?.numberOfTaxPeriods ?? 0 as number;
+    //     } else if (type === PeriodTypes.Reporting) {
+    //         return this.periodsSettingData?.numberOfReportingPeriods ?? 0 as number;
+    //     } else {
+    //         return number; // This will return 0 by default
+    //     }
+    // }
     submit(){
         this.form.markAllAsTouched();
         this.form.updateValueAndValidity();
@@ -104,60 +126,29 @@ export class TeacherCreateComponent {
         }
        }
     }
-
-    onSubmit() {
-  const teacherData: Teacher = this.form.value;  // بيانات النموذج عدا الصورة
-  const imageFile = this.selectedImageFile;      // ملف الصورة المختار من input file
-  
-  this.teacherService.create(teacherData, imageFile).subscribe({
-    next: (res) => {
-      this.messageService.add({ severity: 'success', detail: 'Teacher created' });
-    },
-    error: (err) => {
-      console.error('Error Add Data full object:', err);
-      this.messageService.add({ severity: 'error', detail: 'Error Add Data' });
+    create(){
+        const data = this.addMapToApi(this.form.getRawValue());
+        console.log(data)
+        this.apiService._initService(ModulesNames.school, EntitiesNames.teacher,'v1');
+        this.form.disable()
+         this.apiService.add(data).pipe(finalize(() => this.form.enable())).subscribe({
+            next: (response) => {
+                console.log('Data',response);
+                this.messageService.add({ severity: 'info', summary: 'Confirmed', detail: 'Your data have been added successfully' });
+                this.router.navigate(['teacher','add'])
+            },
+            error:(error) =>{
+                this.form.enable()
+                console.log('Error Fetching Data',error);
+                this.errorHandlerService.handleError(error,this.messageService);
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: `Error Add Data`,
+                });
+            }
+         });
     }
-  });
-}
-
- create() {
-  const formData = new FormData();
-  const data = this.form.getRawValue();
-
-  // أضف بيانات الفورم ما عدا الصورة
-  Object.keys(data).forEach(key => {
-    if (key !== 'image') {
-      let value = data[key];
-      // لو القيم مصفوفة أو كائنات تحتاج تحويل
-      if (Array.isArray(value) || typeof value === 'object') {
-        value = JSON.stringify(value);
-      }
-      formData.append(key, value);
-    }
-  });
-
-  // أضف الصورة لو موجودة
-  if (data.image && data.image instanceof File) {
-    formData.append('image', data.image, data.image.name);
-  }
-
-  this.apiService._initService(ModulesNames.school, EntitiesNames.teacher, 'v1');
-  this.form.disable();
-
-  this.apiService.add(formData).pipe(finalize(() => this.form.enable())).subscribe({
-    next: (response) => {
-      this.messageService.add({ severity: 'info', summary: 'Confirmed', detail: 'Your data have been added successfully' });
-      this.router.navigate(['teacher', 'add']);
-    },
-    error: (error) => {
-      console.error('Error Add Data:', error);
-      this.form.enable();
-      this.errorHandlerService.handleError(error, this.messageService);
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error Add Data' });
-    }
-  });
-}
-
     update(){
         const data = this.editMapToApi(this.form.getRawValue());
         console.log(data)
@@ -167,7 +158,7 @@ export class TeacherCreateComponent {
             next: (response) => {
                 console.log('Data',response);
                 this.messageService.add({ severity: 'info', summary: 'Confirmed', detail: 'Your data have been updated successfully' });
-                this.router.navigate(['teacher','edit',response.id])
+                this.router.navigate(['teacher','edite'])
             },
             error:(error) =>{
                 this.form.enable()
@@ -193,8 +184,6 @@ export class TeacherCreateComponent {
       return data;
     }
 
-
-
   mapFromApi(data: any) {
     this.form.patchValue({
       fullName: data.fullName,
@@ -204,6 +193,7 @@ export class TeacherCreateComponent {
       address: data.address,
       image: data.image,
     });
+    this.teatherId = data.id;
   }
 
   scrollToFirstError() {
@@ -236,9 +226,6 @@ export class TeacherCreateComponent {
     }
 
     initForm() {
-      this.form = this.formFactory.createForm(this.formFields);
-      this.form.addControl('image', new FormControl(null));
-
       this.formFields = [
         {
           colSize: 'col-12 md:col-6',
@@ -324,8 +311,17 @@ export class TeacherCreateComponent {
         },
       ];
       this.form = this.formFactory.createForm(this.formFields);
+      this.form.addControl('image', new FormControl(null));
     }
 
-    
+    onFileSelected(event: any) {
+      const file: File = event?.target?.files?.[0];
+      if (file) {
+        this.selectedImageFile = file;
+        this.form.patchValue({ image: file });
+        this.form.get('image')?.markAsDirty();
+      }
+    }
+
 }
 
