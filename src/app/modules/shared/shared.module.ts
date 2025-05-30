@@ -36,7 +36,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
-
+import { InputGroupModule } from 'primeng/inputgroup';
 
 // others
 
@@ -79,6 +79,7 @@ import {ConfirmDialogModule} from 'primeng/confirmdialog';
     IconFieldModule,
     InputIconModule,
     ConfirmDialogModule,
+    InputGroupModule,
   ],
   providers: [],
   exports: [
@@ -116,7 +117,8 @@ import {ConfirmDialogModule} from 'primeng/confirmdialog';
     IconFieldModule,
     InputIconModule,
     ConfirmDialogModule,
-    ConfirmDialog
+    ConfirmDialog,
+    InputGroupModule
     
   ],
 

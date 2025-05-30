@@ -68,6 +68,13 @@ const routes: Routes = [
                         m.TeachersRoutingModule
                ),
             },
+                        {
+                path: 'students',
+                loadChildren: () =>
+                    import('./modules/pages/students/students-routing.module').then((m) =>
+                        m.StudentsRoutingModule
+               ),
+            },
             {
                 path: 'doc-type-ages',
                 loadChildren: () =>

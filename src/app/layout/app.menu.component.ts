@@ -67,6 +67,12 @@ export class AppMenuComponent implements OnInit, AfterViewInit {
                 routerLink: ['/teachers'],
                 role: this.isAdmin,
             },
+              {
+                label: 'Students',
+                icon: 'pi pi-fw pi-file',
+                routerLink: ['/students'],
+                role: this.isAdmin,
+            },
             {
                 label: 'Document Type Ages',
                 icon: 'pi pi-fw pi-file',
