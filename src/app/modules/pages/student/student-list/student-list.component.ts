@@ -190,6 +190,14 @@ initTableConfig() {
     totalRecords: 0,
     class: 'border-0',
     actionButtons: [
+           {
+        icon: 'pi pi-eye',
+        // tooltip: 'View',
+        onClick: (student: Student) => {
+          this.router.navigate(['student', 'details', student.studentId]);
+        },
+        colorClass: 'p-button-primary',
+      },
       {
         icon: 'pi pi-pencil',
         onClick: (student: Student) => {

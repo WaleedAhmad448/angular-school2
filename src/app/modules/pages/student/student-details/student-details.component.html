@@ -1,0 +1,114 @@
+<app-page-heading *ngIf="headerOptions" [pageHeaderOptions]="headerOptions"></app-page-heading>
+
+<div class="card overflow-auto my-3 p-5 border-round-2xl">
+  <div class="grid">
+    <!-- Column 1: Student Information -->
+    <div class="col-12 md:col-6">
+      <div class="p-3 surface-card border-round">
+        <h4 class="mb-4">Student Information</h4>
+        
+        <div class="grid">
+          <div class="col-4 font-bold">ID:</div>
+          <div class="col-8">{{ student?.studentId }}</div>
+          
+          <div class="col-4 font-bold">Name:</div>
+          <div class="col-8">{{ student?.studentName }}</div>
+          
+          <div class="col-4 font-bold">NRC No:</div>
+          <div class="col-8">{{ student?.studentNrc }}</div>
+          
+          <div class="col-4 font-bold">Age:</div>
+          <div class="col-8">{{ student?.age }}</div>
+          
+          <div class="col-4 font-bold">Gender:</div>
+          <div class="col-8">{{ student?.gender }}</div>
+          
+          <div class="col-4 font-bold">Date of Birth:</div>
+          <div class="col-8">{{ student?.dateOfBirth | date }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Column 2: Photo and Additional Info -->
+    <div class="col-12 md:col-6">
+      <div class="p-3 surface-card border-round h-full">
+        <div class="flex flex-column align-items-center">
+          <img *ngIf="student?.photo" 
+               [src]="serverBaseUrl + student?.photo" 
+               alt="Student Photo" 
+               class="w-15rem h-15rem border-circle mb-4">
+          
+          <div class="grid w-full">
+            <div class="col-4 font-bold">Father Name:</div>
+            <div class="col-8">{{ student?.fatherName }}</div>
+            
+            <div class="col-4 font-bold">Township:</div>
+            <div class="col-8">{{ student?.township }}</div>
+            
+            <div class="col-4 font-bold">Address:</div>
+            <div class="col-8">{{ student?.address }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Marks Section -->
+  <div class="mt-5">
+    <h4>Academic Records</h4>
+    <p-table [value]="student?.mark || []" 
+             [rows]="5" 
+             [paginator]="true" 
+             styleClass="p-datatable-striped">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Date</th>
+          <th>Mark 1</th>
+          <th>Mark 2</th>
+          <th>Mark 3</th>
+          <th>Total</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-mark>
+        <tr>
+          <td>{{ mark.date | date }}</td>
+          <td>{{ mark.mark1 }}</td>
+          <td>{{ mark.mark2 }}</td>
+          <td>{{ mark.mark3 }}</td>
+          <td>{{ mark.total }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="text-center">No marks recorded for this student</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="flex justify-content-between mt-5">
+    <button pButton 
+            icon="pi pi-arrow-left" 
+            label="Back to List" 
+            class="p-button-secondary" 
+            (click)="goBack()"></button>
+    
+    <div class="flex gap-2">
+      <button pButton 
+              icon="pi pi-pencil" 
+              label="Edit" 
+              class="p-button-primary" 
+              (click)="editStudent()"></button>
+      
+      <button pButton 
+              icon="pi pi-trash" 
+              label="Delete" 
+              class="p-button-danger" 
+              (click)="confirmDelete()"></button>
+    </div>
+  </div>
+</div>
+
+<p-toast></p-toast>
+<p-confirmDialog [style]="{width: '500px'}"></p-confirmDialog>

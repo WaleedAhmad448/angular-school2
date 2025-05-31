@@ -24,6 +24,27 @@ const routes: Routes = [
         loadComponent: () => import('./student-create/student-create.component').then(m => m.StudentCreateComponent),
         
     },
+    {
+        path: 'details/:id',
+        loadComponent: () =>
+            import('./student-details/student-details.component').then(m =>
+                m.StudentDetailsComponent
+            ),
+    }
+    // {
+    //     path: '',
+    //     component: ListComponent,
+    //     // redirectTo: '/add',
+    //     pathMatch: 'full',
+    // },
+    // {
+    //     path: 'add',
+    //     component: HomeComponent,
+    // },
+    // {
+    //     path: 'details/:studentId',
+    //     component: DetailsComponent,
+    // }
 
 ];
 @NgModule({
