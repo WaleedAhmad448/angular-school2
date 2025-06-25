@@ -14,6 +14,9 @@ import { TableModule } from 'primeng/table';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api/confirmationservice';
+import { ToastModule } from 'primeng/toast';
+import { DialogModule } from 'primeng/dialog';
+import { DropdownModule } from 'primeng/dropdown';
 
 @NgModule({
     declarations: [
@@ -30,7 +33,10 @@ import { ConfirmationService } from 'primeng/api/confirmationservice';
         MatDialogModule,
         TableModule,
         // SharedModule,
-        ConfirmDialogModule,    
+        ConfirmDialogModule, 
+        ToastModule,
+        DialogModule, 
+        DropdownModule
         
     ],
     providers: [

@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
 import swal from 'sweetalert2';
 import {MatDialogRef} from '@angular/material/dialog';
 import {faArrowLeft,faTimes} from '@fortawesome/free-solid-svg-icons';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -14,11 +15,10 @@ import {faArrowLeft,faTimes} from '@fortawesome/free-solid-svg-icons';
   styleUrl: './home.component.css',
 })
 export class HomeComponent {
-
   faArrowLeft = faArrowLeft;
   faDelete =faTimes;
 
-  localDomain = 'http://localhost:8080';
+  serverBaseUrl: string = environment.baseUrl;
 
   showDialog: boolean = true;
 
@@ -100,21 +100,21 @@ export class HomeComponent {
       return;
     }
   
-    // this.studentService.createStudent(data).subscribe({
-    //   next: (response) => {
-    //     this.submitted = true;
-    //     this.dialogRef.close();
-    //     window.location.reload();
-    //   },
-    //   error: (error) => {
-    //     console.error('Error creating student:', error);
-    //     swal.fire({
-    //       icon: 'error',
-    //       title: 'Error',
-    //       text: 'An error occurred while creating the student.',
-    //     });
-    //   }
-    // });
+    this.studentService.createStudent(data).subscribe({
+      next: (response) => {
+        this.submitted = true;
+        this.dialogRef.close();
+        window.location.reload();
+      },
+      error: (error) => {
+        console.error('Error creating student:', error);
+        swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'An error occurred while creating the student.',
+        });
+      }
+    });
   }  
   onCancel(): void {
     this.submitted = false;
@@ -184,5 +184,7 @@ export class HomeComponent {
     this.student.mark?.splice(index, 1);
   }
 }
+
+
 
 

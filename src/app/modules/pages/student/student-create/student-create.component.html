@@ -1,31 +1,74 @@
-<app-page-heading *ngIf="headerOptions" [pageHeaderOptions]="headerOptions">
-</app-page-heading>
-<div class="card border-round-2xl" #formContainerRef *ngIf="form">
-    <kitsng-form-factory 
-    [fields]="formFields"
-    [form]="form"
-></kitsng-form-factory>
-
-  <div class="col-12 md:col-6">
-  <label for="photo">Upload Photo</label>
-  <div *ngIf="imagePreviewUrl">
-    <input
-    type="file"
-    id="photo"  
-    src="{{imagePreviewUrl}}"
-    (change)="onFileSelected($event)"
-    #fileInput
-    (click)="fileInput.click()"
-    class="p-inputtext p-component"
-  /></div>
-</div>
-
-
-
-<div class="flex justify-content-end gap-1">
-    <p-button type="submit" [label]="pageUrl=='edit'? 'Update': 'Submit'" (onClick)="submit()" [disabled]="form.disabled" [loading]="form.disabled"></p-button>
-    <p-button  label="Cancel" (onClick)="back()" [disabled]="form.disabled"></p-button>
+<p-dialog [(visible)]="showDialog" modal="true" [closable]="false" header="Create Student" [style]="{width: '70vw'}">
+  <div class="p-fluid p-formgrid p-grid">
+    <div class="p-field p-col-12 p-md-6">
+      <label for="studentName">Student Name</label>
+      <input id="studentName" type="text" pInputText [(ngModel)]="student.studentName" />
+    </div>
+    <div class="p-field p-col-12 p-md-6">
+      <label for="studentNrc">NRC</label>
+      <input id="studentNrc" type="text" pInputText [(ngModel)]="student.studentNrc" />
+    </div>
+    <div class="p-field p-col-12 p-md-6">
+      <label for="fatherName">Father Name</label>
+      <input id="fatherName" type="text" pInputText [(ngModel)]="student.fatherName" />
+    </div>
+    <div class="p-field p-col-12 p-md-6">
+      <label for="gender">Gender</label>
+      <p-dropdown [options]="[ {label: 'Male', value: genderEnum.MALE}, {label: 'Female', value: genderEnum.FEMALE} ]" [(ngModel)]="selectedGender"></p-dropdown>
+    </div>
+    <div class="p-field p-col-12 p-md-6">
+      <label for="dob">Date of Birth</label>
+      <p-calendar [(ngModel)]="student.dateOfBirth" inputId="dob" dateFormat="yy-mm-dd"></p-calendar>
+    </div>
+    <div class="p-field p-col-12 p-md-6">
+      <label for="age">Age</label>
+      <input id="age" type="number" pInputText [(ngModel)]="student.age" />
+    </div>
+    <div class="p-field p-col-12 p-md-6">
+      <label for="address">Address</label>
+      <input id="address" type="text" pInputText [(ngModel)]="student.address" />
+    </div>
+    <div class="p-field p-col-12 p-md-6">
+      <label for="township">Township</label>
+      <input id="township" type="text" pInputText [(ngModel)]="student.township" />
+    </div>
+    <div class="p-field p-col-12">
+      <label for="photo">Photo</label>
+      <input type="file" (change)="onFileSelected($event)" accept="image/*" />
+      <img *ngIf="imagePreviewUrl" [src]="imagePreviewUrl" class="preview-img" style="max-height: 150px; margin-top: 10px;" />
+    </div>
   </div>
-</div>
-<p-toast></p-toast>
 
+  <div class="p-mt-4">
+    <h4>Marks</h4>
+    <div *ngFor="let mark of student.mark; let i = index" class="p-grid p-ai-center p-mb-2">
+      <div class="col-2">
+        <p-calendar [(ngModel)]="mark.date" dateFormat="yy-mm-dd" showIcon="true"></p-calendar>
+      </div>
+      <div class="col-2">
+        <input type="number" pInputText [(ngModel)]="mark.mark1" (input)="calculateTotal(i)" placeholder="Mark 1" />
+      </div>
+      <div class="col-2">
+        <input type="number" pInputText [(ngModel)]="mark.mark2" (input)="calculateTotal(i)" placeholder="Mark 2" />
+      </div>
+      <div class="col-2">
+        <input type="number" pInputText [(ngModel)]="mark.mark3" (input)="calculateTotal(i)" placeholder="Mark 3" />
+      </div>
+      <div class="col-2">
+        <input type="number" pInputText [(ngModel)]="mark.total" readonly placeholder="Total" />
+      </div>
+      <div class="col-2">
+        <button pButton type="button" icon="pi pi-trash" class="p-button-rounded p-button-danger" (click)="removeMark(i)"></button>
+    </div>
+  </div>
+              <button pButton type="button" label="Add Mark" icon="pi pi-plus" (click)="addMark()"></button>
+
+  </div>
+
+
+  <p-footer>
+    <button pButton type="button" label="Cancel" icon="pi pi-times" (click)="closeDialog()" class="p-button-secondary"></button>
+    <button pButton type="button" label="Save" icon="pi pi-check" (click)="saveStudent()" class="p-button-success"></button>
+  </p-footer>
+</p-dialog>
+<p-toast></p-toast>
